@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function FeedbackForm() {
   const [feedback, setFeedback] = useState({
@@ -7,6 +10,7 @@ export default function FeedbackForm() {
     rating: 1,
     comments: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,16 +20,49 @@ export default function FeedbackForm() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle the form submission logic (e.g., send data to server)
-    console.log('Feedback Submitted: ', feedback);
-    alert('Feedback Submitted!');
-    setFeedback({ name: '', email: '', rating: 1, comments: '' }); // Reset form after submission
+    setIsSubmitting(true);
+
+    try {
+      const response = await axios.post('http://localhost:8080/public/addFeedback', feedback);
+      
+      if (response.status === 200) {
+        toast.success('Feedback submitted successfully!', {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        
+        // Reset form after successful submission
+        setFeedback({ 
+          name: '', 
+          email: '', 
+          rating: 1, 
+          comments: '' 
+        });
+      }
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      toast.error('Failed to submit feedback. Please try again.', {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+      <ToastContainer />
       <h2 className="text-2xl font-semibold text-center mb-6">Feedback Form</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
@@ -66,10 +103,10 @@ export default function FeedbackForm() {
             className="w-full p-2 border rounded"
           >
             <option value="1">😞 - Poor</option>
-            <option value="2">😐  - Fair</option>
+            <option value="2">😐 - Fair</option>
             <option value="3">🙂 - Good</option>
-            <option value="4">😊  - Very Good</option>
-            <option value="5">😍- Excellent</option>
+            <option value="4">😊 - Very Good</option>
+            <option value="5">😍 - Excellent</option>
           </select>
         </div>
 
@@ -86,7 +123,13 @@ export default function FeedbackForm() {
           ></textarea>
         </div>
 
-        <button type="submit" className="w-full bg-purple-600 text-white p-3 rounded-lg">Submit Feedback</button>
+        <button 
+          type="submit" 
+          className={`w-full p-3 rounded-lg ${isSubmitting ? 'bg-purple-400' : 'bg-purple-600'} text-white`}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+        </button>
       </form>
     </div>
   );

@@ -44,13 +44,13 @@ export default function AdminManagementDashboard() {
       </h1>
       <div className="grid grid-cols-3 gap-6 mt-10 p-6 rounded-lg">
         {/* Skill Category Management Card */}
-        <Link to="/SkillCategoryManagement" className="flex flex-col items-center p-6 h-40 bg-gradient-to-b from-purple-600 to-black shadow-lg rounded-lg">
+        <Link to="/SkillCategoryForm" className="flex flex-col items-center p-6 h-40 bg-gradient-to-b from-purple-600 to-black shadow-lg rounded-lg">
           <FaTasks className="text-white text-3xl" />
           <p className="mt-2 font-semibold text-white">Skill Category Management</p>
         </Link>
         
         {/* Skill Assessment and Feedback Card */}
-        <Link to="/skill-assessment" className="flex flex-col items-center p-6 h-40 bg-gradient-to-b from-purple-600 to-black shadow-lg rounded-lg">
+        <Link to="/FeedbackManagement" className="flex flex-col items-center p-6 h-40 bg-gradient-to-b from-purple-600 to-black shadow-lg rounded-lg">
           <FaChartBar className="text-white text-3xl" />
           <p className="mt-2 font-semibold text-white">Skill Assessment and Feedback</p>
         </Link>
