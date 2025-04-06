@@ -62,51 +62,43 @@ const SkillCategoryForm = () => {
         formDataToSend.append('categoryImage', formData.categoryImage);
       }
 
-      console.log('Form data being sent:', {
-        categoryTitle: formData.categoryTitle,
-        categoryName: formData.categoryName,
-        description: formData.description,
-        hasImage: !!formData.categoryImage
-      });
-
       const response = await axios.post(
         'http://localhost:8080/public/addCategory',
         formDataToSend,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${localStorage.getItem('token')}` // Add if using authentication
-          },
-          withCredentials: true // Include if using cookies/sessions
+            'Content-Type': 'multipart/form-data'
+          }
         }
       );
-
-      console.log('Response:', response);
 
       if (response.status === 201) {
         toast.success('Category created successfully!');
         setTimeout(() => {
-          navigate('/admin');
+          navigate('/AdminManagementDashboard');
         }, 1500);
       } else {
         throw new Error(response.data?.message || 'Failed to create category');
       }
     } catch (error) {
-      console.error('Detailed error:', {
-        message: error.message,
-        response: error.response,
-        stack: error.stack
-      });
+      console.error('Detailed error:', error);
       
       let errorMessage = 'Failed to create category';
       if (error.response) {
-        // The request was made and the server responded with a status code
-        errorMessage = error.response.data?.message || 
-                      error.response.data?.error || 
-                      error.response.statusText;
+        // Server responded with error status code
+        if (error.response.data) {
+          errorMessage = error.response.data.message || 
+                         error.response.data.error || 
+                         JSON.stringify(error.response.data);
+        } else {
+          errorMessage = `Server responded with status ${error.response.status}`;
+        }
       } else if (error.request) {
-        // The request was made but no response was received
-        errorMessage = 'No response from server';
+        // Request was made but no response received
+        errorMessage = 'No response from server. Check your backend connection.';
+      } else {
+        // Something happened in setting up the request
+        errorMessage = error.message;
       }
       
       toast.error(errorMessage);
@@ -185,7 +177,7 @@ const SkillCategoryForm = () => {
         
         {/* Header */}
         <div className="mb-8">
-          <Link to="/admin" className="text-purple-300 hover:text-white transition-colors">
+          <Link to="/AdminManagementDashboard" className="text-purple-300 hover:text-white transition-colors">
             ← Back to Dashboard
           </Link>
           <div className="flex justify-between items-center mt-4">
@@ -320,7 +312,7 @@ const SkillCategoryForm = () => {
             <div className="mt-10 flex justify-between items-center">
               <button
                 type="button"
-                onClick={() => navigate('/admin')}
+                onClick={() => navigate('/AdminManagementDashboard')}
                 className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 Cancel

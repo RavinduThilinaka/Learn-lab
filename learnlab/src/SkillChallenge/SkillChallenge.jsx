@@ -1,4 +1,4 @@
-import { FaHome, FaUser, FaCog, FaQuestionCircle, FaSignOutAlt, FaUsers, FaChartLine, FaTrophy, FaClock, FaPlus } from "react-icons/fa";
+import { FaHome, FaUser, FaCog, FaQuestionCircle, FaSignOutAlt, FaUsers, FaChartLine, FaTrophy, FaClock, FaPlus, FaCheck, FaCheckCircle } from "react-icons/fa";
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import Logo from "../Images/logo1.png";
 import { useState } from "react";
@@ -24,7 +24,7 @@ export default function SkillChallenge() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -61,7 +61,7 @@ export default function SkillChallenge() {
       }
 
       const data = await response.json();
-      setSubmitSuccess(true);
+      setShowSuccessPopup(true);
       setFormData({
         questionText: "",
         deadLine: "",
@@ -72,7 +72,7 @@ export default function SkillChallenge() {
         correctAnswer: ""
       });
       
-      setTimeout(() => setSubmitSuccess(false), 5000);
+      setTimeout(() => setShowSuccessPopup(false), 6000);
     } catch (error) {
       console.error('Error submitting challenge:', error);
       setSubmitError(error.message || 'Failed to submit challenge');
@@ -83,6 +83,41 @@ export default function SkillChallenge() {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-purple-700 to-black text-white">
+      {/* Success Popup */}
+   
+      {showSuccessPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 backdrop-blur-sm">
+          <div className="bg-white p-8 rounded-2xl shadow-xl w-96 transform transition-all duration-300 animate-scale-in">
+            <div className="flex flex-col items-center">
+              {/* Animated checkmark circle */}
+              <div className="relative mb-6">
+                <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center">
+                  <FaCheckCircle className="text-purple-600 text-5xl" />
+                </div>
+                {/* Pulsing ring effect */}
+                <div className="absolute inset-0 rounded-full border-4 border-purple-200 animate-ping opacity-0"></div>
+              </div>
+              
+              {/* Content */}
+              <div className="text-center">
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">Successfully Published!</h3>
+                <p className="text-gray-600 mb-6">Your challenge is now live and visible to users.</p>
+                
+                {/* Progress bar */}
+                <div className="w-full bg-gray-200 rounded-full h-1.5 mb-4">
+                  <div 
+                    className="bg-purple-600 h-1.5 rounded-full animate-progress" 
+                    style={{ animationDuration: '6s' }}
+                  ></div>
+                </div>
+                
+                <p className="text-sm text-gray-500">Closing automatically...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Sidebar */}
       <aside className="w-72 fixed left-0 top-0 h-full bg-gradient-to-b from-purple-600 to-black text-white p-6 flex flex-col justify-between border-r border-purple-500/20">
         <div>
@@ -112,12 +147,21 @@ export default function SkillChallenge() {
             </Link>
             <Link 
               to="/SkillChallenge" 
-              className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 group border border-white/5 hover:border-white/20"
+              className="flex items-center gap-3 p-4 rounded-xl bg-purple-700/80 hover:bg-purple-600 transition-all duration-300 group border border-purple-500/50 hover:border-purple-400"
             >
               <div className="w-8 h-8 flex items-center justify-center bg-purple-500 rounded-lg group-hover:bg-purple-400 transition-colors">
                 <FaPlus className="text-white" />
               </div>
               <span className="font-medium">Create Challenge</span>
+            </Link>
+            <Link 
+              to="/viewChallange" 
+              className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 group border border-white/5 hover:border-white/20"
+            >
+              <div className="w-8 h-8 flex items-center justify-center bg-purple-500 rounded-lg group-hover:bg-purple-400 transition-colors">
+                <FaTrophy className="text-white" />
+              </div>
+              <span className="font-medium">All Challenges</span>
             </Link>
             <Link 
               to="/skillAnalysis" 
@@ -327,16 +371,10 @@ export default function SkillChallenge() {
               </div>
             </div>
 
-            {/* Status messages */}
+            {/* Error message */}
             {submitError && (
               <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl">
                 Error: {submitError}
-              </div>
-            )}
-            
-            {submitSuccess && (
-              <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-xl">
-                Challenge created successfully!
               </div>
             )}
 

@@ -79,14 +79,24 @@ export default function SkillChallengeAnalysis() {
               <span className="font-medium">Create Challenge</span>
             </Link>
             <Link 
+              to="/viewChallange" 
+              className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 group border border-white/5 hover:border-white/20"
+            >
+              <div className="w-8 h-8 flex items-center justify-center bg-purple-400 rounded-lg group-hover:bg-purple-300 transition-colors">
+                <FaTrophy className="text-white" />
+              </div>
+              <span className="font-medium">All Challenges</span>
+            </Link>
+            <Link 
               to="/SkillChallengeAnalysis" 
-              className="flex items-center gap-3 p-4 rounded-xl bg-white/10 border border-white/20 transition-all duration-300 group"
+              className="flex items-center gap-3 p-4 rounded-xl bg-purple-700/80 hover:bg-purple-600 transition-all duration-300 group border border-purple-500/50 hover:border-purple-400"
             >
               <div className="w-8 h-8 flex items-center justify-center bg-purple-400 rounded-lg">
                 <FaChartLine className="text-white" />
               </div>
               <span className="font-medium">Analytics</span>
             </Link>
+           
             <Link 
               to="/help" 
               className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 group border border-white/5 hover:border-white/20"
@@ -259,4 +269,4 @@ export default function SkillChallengeAnalysis() {
       </main>
     </div>
   );
-}
+} 
