@@ -136,15 +136,7 @@ export default function AnalyticsDashboard() {
               </div>
               <span className="font-medium">Create Session</span>
             </Link>
-            <Link 
-              to="/ViewAllSessions" 
-              className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 group border border-white/5 hover:border-white/20"
-            >
-              <div className="w-8 h-8 flex items-center justify-center bg-purple-500 rounded-lg group-hover:bg-purple-400 transition-colors">
-                <FaCalendarAlt className="text-white" />
-              </div>
-              <span className="font-medium">View Sessions</span>
-            </Link>
+           
             <Link 
               to="/AnalyticsDashboard" 
               className="flex items-center gap-3 p-4 rounded-xl bg-purple-800/80 hover:bg-purple-700 transition-all duration-300 group border border-purple-500/30 hover:border-purple-400/50"
