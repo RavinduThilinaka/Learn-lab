@@ -50,7 +50,7 @@ const App = () => {
         <Route path="/qizeintro" element={<QuizIntroPage/>}/>
         <Route path="/quize" element={<QuizPage/>}/>
         <Route path="/skillAnalysis" element={<SkillChallengeAnalysis/>}/>
-        <Route path="//updateChallange/:id" element={<UpdateSkillChallenge/>}/>
+        <Route path="/updateChallange/:id" element={<UpdateSkillChallenge/>}/>
         <Route path="/viewChallange" element={<ViewAllChallenge/>}/>
 
 
