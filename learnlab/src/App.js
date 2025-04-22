@@ -21,6 +21,8 @@ import QuizIntroPage from './UserAnswer/QuizIntroPage';
 import QuizPage from './UserAnswer/QuizPage';
 
 import SkillCategoryForm  from './SkillCatergory/SkillCatergory';
+import CategoryListPage from './SkillCatergory/categoryData';
+
 import UpdateSkillChallenge from './SkillChallenge/UpdateSkillChallenge';
 import ViewAllChallenge from './SkillChallenge/ViewAllChallenge';
 
@@ -55,6 +57,7 @@ const App = () => {
 
 
         <Route path="/SkillCategoryForm" element={<SkillCategoryForm/>}/>
+        <Route path="/CategoryListPage" element={<CategoryListPage/>}/>
        
 
       </Routes>
