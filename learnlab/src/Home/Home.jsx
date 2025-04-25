@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { FaSearch, FaUser, FaShoppingCart, FaCalendarAlt, FaClock, FaPlay, FaTimes, FaMapMarkerAlt, FaPhone, FaEnvelope, FaPaperPlane, FaInfinity, FaChalkboardTeacher, FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
+import { FaSearch, FaRobot , FaShoppingCart, FaCalendarAlt, FaClock, FaPlay, FaTimes, FaMapMarkerAlt, FaPhone, FaEnvelope, FaPaperPlane, FaInfinity, FaChalkboardTeacher, FaStar, FaRegStar, FaStarHalfAlt,FaComment  } from "react-icons/fa";
 import class1Image from '../Images/b1.jpg';
 import class2Image from '../Images/b2.jpg';
 import class3Image from '../Images/b3.jpg';
@@ -14,6 +14,7 @@ import { faPhoneAlt, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { faFacebookF, faTwitter, faLinkedinIn, faInstagram, faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import axios from 'axios';
 import Navbar from "../Navbar/Navbar";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -200,7 +201,7 @@ export default function Home() {
     setFormErrors(errors);
     
     if (Object.keys(errors).length === 0) {
-      // Here you would typically send the form data to your backend
+     
       console.log('Form submitted:', formData);
       setFormSubmitted(true);
       setFormData({
@@ -211,17 +212,17 @@ export default function Home() {
         message: ''
       });
       
-      // Reset form submission status after 5 seconds
+    
       setTimeout(() => {
         setFormSubmitted(false);
       }, 5000);
     }
   };
 
-  // Function to render star ratings
+ 
   const renderStars = (rating) => {
     const stars = [];
-    // Convert rating to number if it's not already
+   
     const numericRating = typeof rating === 'number' ? rating : 0;
     const fullStars = Math.floor(numericRating);
     const hasHalfStar = numericRating % 1 !== 0;
@@ -256,7 +257,14 @@ export default function Home() {
             Learn from thousands of inspiring classes to enhance your skills.
           </p>
           <div className="mt-6 flex gap-4 justify-center">
-            <button className="bg-white text-black px-6 py-2 rounded animate-fadeInSlide animation-delay-3s">Browse Classes</button>
+          <Link 
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg animate-fadeInSlide animation-delay-3s shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 hover:bg-indigo-700"
+            aria-label="AI Chat Assistant"
+            to={"/bot"}
+          >
+          <FaRobot className="h-5 w-5" />
+          <span>AI Assistant</span>
+        </Link>
             <button className="bg-yellow-500 text-white px-6 py-2 rounded animate-fadeInSlide animation-delay-4s">Get Started</button>
           </div>
         </div>
@@ -657,7 +665,7 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {feedbacks.map((feedback) => {
-                // Safely handle the feedback data
+               
                 const userName = feedback.userName || feedback.user?.name || 'Anonymous User';
                 const userInitial = userName.charAt(0).toUpperCase();
                 const comment = feedback.comment || feedback.feedbackText || 'No comment provided';

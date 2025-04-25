@@ -26,6 +26,10 @@ import CategoryListPage from './SkillCatergory/categoryData';
 import UpdateSkillChallenge from './SkillChallenge/UpdateSkillChallenge';
 import ViewAllChallenge from './SkillChallenge/ViewAllChallenge';
 import Navbar from './Navbar/Navbar';
+import Chatbot from './Chatbot/Chatbot';
+import ChatForm from './Chatbot/ChatForm';
+import ChatMessage from './Chatbot/ChatMessage';
+
 
 
 
@@ -61,7 +65,9 @@ const App = () => {
         <Route path="/SkillCategoryForm" element={<SkillCategoryForm/>}/>
         <Route path="/CategoryListPage" element={<CategoryListPage/>}/>
        
-
+        <Route path="/bot" element={<Chatbot/>}/>
+        <Route path="/chatform" element={<ChatForm/>}/>
+        <Route path="/chatmessage" element={<ChatMessage/>}/>
       </Routes>
     </Router>
   );
