@@ -25,6 +25,7 @@ import CategoryListPage from './SkillCatergory/categoryData';
 
 import UpdateSkillChallenge from './SkillChallenge/UpdateSkillChallenge';
 import ViewAllChallenge from './SkillChallenge/ViewAllChallenge';
+import Navbar from './Navbar/Navbar';
 
 
 
@@ -33,6 +34,7 @@ const App = () => {
     <Router>
       <Routes>
         {/* Set the root path to render the Home component */}
+        <Route path="/navbar" element={<Navbar />} />
         <Route path="/Home" element={<Home />} />
         <Route path="/" element={<VideoBackgroundPage/>}/>
         <Route path="/AdminManagementDashboard" element={<AdminManagementDashboard/>}/>
@@ -45,8 +47,8 @@ const App = () => {
         <Route path="/FeedbackManagement" element={<FeedbackManagement/>}/>
 
         
-        <Route path="/LoginForm" element={<LoginForm/>}/>
-        <Route path="/SignupForm" element={<SignupForm/>}/>
+        <Route path="/Login" element={<LoginForm/>}/>
+        <Route path="/Signup" element={<SignupForm/>}/>
 
         <Route path="/skillChallenge" element={<SkillChallenge/>}/>
         <Route path="/qizeintro" element={<QuizIntroPage/>}/>

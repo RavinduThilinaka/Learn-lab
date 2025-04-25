@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhoneAlt, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { faFacebookF, faTwitter, faLinkedinIn, faInstagram, faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import axios from 'axios';
+import Navbar from "../Navbar/Navbar";
 
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -240,32 +241,7 @@ export default function Home() {
 
   return (
     <div className="w-full min-h-screen bg-gray-100">
-      <header className="sticky top-0 z-50 w-full bg-white shadow-md p-4 transition-all duration-300">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-3xl font-extrabold text-black hover:text-yellow-500 transition-colors duration-300 cursor-pointer">
-            Skillshare
-          </h1>
-
-          <div className="flex items-center gap-6">
-            <div className="relative group">
-              <FaSearch className="text-gray-600 text-xl cursor-pointer group-hover:text-yellow-500 transition-colors duration-300" />
-            </div>
-
-            <div className="relative group">
-              <FaUser className="text-gray-600 text-xl cursor-pointer group-hover:text-yellow-500 transition-colors duration-300" />
-            </div>
-
-            <div className="relative group">
-              <FaShoppingCart className="text-gray-600 text-xl cursor-pointer group-hover:text-yellow-500 transition-colors duration-300" />
-            </div>
-
-            <button className="bg-black text-white px-6 py-2 rounded-full hover:bg-yellow-500 hover:text-black transition-colors duration-300">
-              Start Free Trial
-            </button>
-          </div>
-        </div>
-      </header>
-
+        <Navbar/>
       <section
         className="relative w-full h-[500px] flex items-center justify-center bg-cover bg-center"
         style={{ backgroundImage: `url(${images[currentIndex]})` }}
