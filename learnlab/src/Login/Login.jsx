@@ -28,7 +28,7 @@ export default function LoginForm() {
           localStorage.setItem('email', userData.email);
 
           if (userData.role === "USER") {
-            navigate("/");
+            navigate("/Home");
           } else if (userData.role === "ADMIN") {
             navigate("/AdminManagementDashboard");
           }
