@@ -323,7 +323,7 @@ export default function ViewAllChallenge() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center space-x-3">
                             <Link
-                              to={`/collectionview/${challenge.id}`}
+                              to={`/view/${challenge.id}`}
                               className="text-blue-600 hover:text-blue-900 transition-colors"
                               title="View"
                             >

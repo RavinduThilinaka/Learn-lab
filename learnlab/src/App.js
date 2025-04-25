@@ -29,6 +29,7 @@ import Navbar from './Navbar/Navbar';
 import Chatbot from './Chatbot/Chatbot';
 import ChatForm from './Chatbot/ChatForm';
 import ChatMessage from './Chatbot/ChatMessage';
+import ViewChallenge from './SkillChallenge/ViewChallange';
 
 
 
@@ -60,6 +61,7 @@ const App = () => {
         <Route path="/skillAnalysis" element={<SkillChallengeAnalysis/>}/>
         <Route path="/updateChallange/:id" element={<UpdateSkillChallenge/>}/>
         <Route path="/viewChallange" element={<ViewAllChallenge/>}/>
+        <Route path="/view/:id" element={<ViewChallenge/>}/>
 
 
         <Route path="/SkillCategoryForm" element={<SkillCategoryForm/>}/>
