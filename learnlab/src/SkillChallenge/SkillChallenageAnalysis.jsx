@@ -1,44 +1,149 @@
+import React, { useState, useEffect } from 'react';
 import { FaHome, FaUser, FaCog, FaQuestionCircle, FaSignOutAlt, FaUsers, FaChartLine, FaTrophy, FaClock, FaPlus } from "react-icons/fa";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import Logo from "../Images/logo1.png";
 
 export default function SkillChallengeAnalysis() {
-  // Sample data for charts
-  const performanceData = [
-    { name: 'Jan', score: 65, participants: 120 },
-    { name: 'Feb', score: 72, participants: 145 },
-    { name: 'Mar', score: 78, participants: 160 },
-    { name: 'Apr', score: 82, participants: 185 },
-    { name: 'May', score: 85, participants: 210 },
-    { name: 'Jun', score: 79, participants: 195 },
-  ];
+  const [challenges, setChallenges] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const challengeDistribution = [
-    { name: 'Technical', value: 35 },
-    { name: 'Analytical', value: 25 },
-    { name: 'Creative', value: 20 },
-    { name: 'Communication', value: 15 },
-    { name: 'Other', value: 5 },
-  ];
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/public/allChallenge');
+        if (!response.ok) throw new Error('Failed to fetch challenges');
+        const data = await response.json();
+        setChallenges(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChallenges();
+  }, []);
+
+  // Process data for charts
+  const processChartData = () => {
+    if (!challenges || challenges.length === 0) return {};
+
+    // Performance over time - handle invalid dates
+    const performanceData = challenges
+      .slice(0, 6)
+      .map(challenge => {
+        let date;
+        try {
+          date = challenge.createdAt ? new Date(challenge.createdAt) : new Date();
+          if (isNaN(date.getTime())) date = new Date(); // Fallback if date is invalid
+        } catch (e) {
+          date = new Date(); // Fallback if date parsing fails
+        }
+        
+        return {
+          name: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          score: challenge.avgScore || 0,
+          participants: challenge.participantsCount || 0
+        };
+      });
+
+    // Challenge type distribution
+    const typeCounts = challenges.reduce((acc, challenge) => {
+      const type = challenge.category || 'Other';
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {});
+
+    const challengeDistribution = Object.entries(typeCounts).map(([name, value]) => ({
+      name,
+      value
+    }));
+
+    // Time completion distribution - handle duration in seconds
+    const timeRanges = [
+      { name: '0-1 min', min: 0, max: 60 },
+      { name: '1-2 min', min: 60, max: 120 },
+      { name: '2-3 min', min: 120, max: 180 },
+      { name: '3-4 min', min: 180, max: 240 },
+      { name: '4+ min', min: 240, max: Infinity }
+    ];
+
+    const timeCompletionData = timeRanges.map(range => {
+      const count = challenges.filter(challenge => {
+        const time = challenge.completionTime || 0;
+        return time >= range.min && time < range.max;
+      }).length;
+      return {
+        name: range.name,
+        value: Math.round((count / challenges.length) * 100)
+      };
+    });
+
+    // Dashboard stats - Corrected calculations
+    const totalParticipants = challenges.reduce((sum, challenge) => sum + (challenge.participantsCount || 0), 0);
+    const avgScore = challenges.length > 0 
+      ? Math.round(challenges.reduce((sum, challenge) => sum + (challenge.avgScore || 0), 0) / challenges.length)
+      : 0;
+    const completionRate = challenges.length > 0
+      ? Math.round((challenges.filter(c => c.completionRate).length / challenges.length) * 100)
+      : 0;
+    const avgTime = challenges.length > 0
+      ? challenges.reduce((sum, challenge) => sum + (challenge.completionTime || 0), 0) / challenges.length / 60
+      : 0;
+
+    const dashboardStats = [
+      { title: "Total Participants", value: totalParticipants.toLocaleString(), icon: <FaUsers className="text-3xl" />, color: "bg-blue-500" },
+      { title: "Avg. Score", value: `${avgScore}%`, icon: <FaChartLine className="text-3xl" />, color: "bg-green-500" },
+      { title: "Completion Rate", value: `${completionRate}%`, icon: <FaTrophy className="text-3xl" />, color: "bg-purple-500" },
+      { title: "Avg. Time", value: `${avgTime.toFixed(1)}m`, icon: <FaClock className="text-3xl" />, color: "bg-yellow-500" }
+    ];
+
+    return {
+      performanceData,
+      challengeDistribution,
+      timeCompletionData,
+      dashboardStats
+    };
+  };
+
+  const { 
+    performanceData = [], 
+    challengeDistribution = [], 
+    timeCompletionData = [], 
+    dashboardStats = [] 
+  } = processChartData();
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-  const timeCompletionData = [
-    { name: '0-1 min', value: 15 },
-    { name: '1-2 min', value: 35 },
-    { name: '2-3 min', value: 25 },
-    { name: '3-4 min', value: 15 },
-    { name: '4+ min', value: 10 },
-  ];
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-gradient-to-b from-purple-700 to-black text-white items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-400 mb-4"></div>
+          <p>Loading analytics data...</p>
+        </div>
+      </div>
+    );
+  }
 
-  // Sample data for the stats cards
-  const dashboardStats = [
-    { title: "Total Participants", value: "1,248", icon: <FaUsers className="text-3xl" />, color: "bg-blue-500" },
-    { title: "Avg. Score", value: "78%", icon: <FaChartLine className="text-3xl" />, color: "bg-green-500" },
-    { title: "Completion Rate", value: "92%", icon: <FaTrophy className="text-3xl" />, color: "bg-purple-500" },
-    { title: "Avg. Time", value: "2.4m", icon: <FaClock className="text-3xl" />, color: "bg-yellow-500" }
-  ];
+  if (error) {
+    return (
+      <div className="flex min-h-screen bg-gradient-to-b from-purple-700 to-black text-white items-center justify-center">
+        <div className="bg-white/10 p-8 rounded-xl max-w-md text-center">
+          <h3 className="text-xl font-bold mb-2">Error Loading Data</h3>
+          <p className="mb-6">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-purple-600 hover:bg-purple-500 px-6 py-2 rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-purple-700 to-black text-white">
@@ -153,45 +258,51 @@ export default function SkillChallengeAnalysis() {
         {/* Performance Over Time Chart */}
         <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Performance Trends</h2>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={performanceData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                <XAxis dataKey="name" stroke="#666" />
-                <YAxis stroke="#666" />
-                <Tooltip 
-                  contentStyle={{
-                    background: 'rgba(255, 255, 255, 0.9)',
-                    border: '1px solid #ddd',
-                    borderRadius: '0.5rem',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="score" 
-                  stroke="#8884d8" 
-                  strokeWidth={3}
-                  dot={{ r: 5 }}
-                  activeDot={{ r: 8 }} 
-                  name="Average Score (%)"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="participants" 
-                  stroke="#82ca9d" 
-                  strokeWidth={3}
-                  dot={{ r: 5 }}
-                  activeDot={{ r: 8 }} 
-                  name="Participants"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          {performanceData.length > 0 ? (
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={performanceData}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+                  <XAxis dataKey="name" stroke="#666" />
+                  <YAxis stroke="#666" />
+                  <Tooltip 
+                    contentStyle={{
+                      background: 'rgba(255, 255, 255, 0.9)',
+                      border: '1px solid #ddd',
+                      borderRadius: '0.5rem',
+                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="score" 
+                    stroke="#8884d8" 
+                    strokeWidth={3}
+                    dot={{ r: 5 }}
+                    activeDot={{ r: 8 }} 
+                    name="Average Score (%)"
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="participants" 
+                    stroke="#82ca9d" 
+                    strokeWidth={3}
+                    dot={{ r: 5 }}
+                    activeDot={{ r: 8 }} 
+                    name="Participants"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="h-80 flex items-center justify-center text-gray-500">
+              No performance data available
+            </div>
+          )}
         </div>
 
         {/* Charts Row */}
@@ -199,74 +310,86 @@ export default function SkillChallengeAnalysis() {
           {/* Challenge Distribution Pie Chart */}
           <div className="bg-white rounded-2xl shadow-xl p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Challenge Types Distribution</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={challengeDistribution}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {challengeDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    formatter={(value) => [`${value} challenges`, 'Count']}
-                    contentStyle={{
-                      background: 'rgba(255, 255, 255, 0.9)',
-                      border: '1px solid #ddd',
-                      borderRadius: '0.5rem',
-                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+            {challengeDistribution.length > 0 ? (
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={challengeDistribution}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {challengeDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value) => [`${value} challenges`, 'Count']}
+                      contentStyle={{
+                        background: 'rgba(255, 255, 255, 0.9)',
+                        border: '1px solid #ddd',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-80 flex items-center justify-center text-gray-500">
+                No challenge type data available
+              </div>
+            )}
           </div>
 
           {/* Time Completion Bar Chart */}
           <div className="bg-white rounded-2xl shadow-xl p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Completion Time Distribution</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={timeCompletionData}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                  <XAxis dataKey="name" stroke="#666" />
-                  <YAxis stroke="#666" />
-                  <Tooltip 
-                    formatter={(value) => [`${value}% of participants`, 'Percentage']}
-                    contentStyle={{
-                      background: 'rgba(255, 255, 255, 0.9)',
-                      border: '1px solid #ddd',
-                      borderRadius: '0.5rem',
-                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  <Bar 
-                    dataKey="value" 
-                    fill="#8884d8" 
-                    radius={[4, 4, 0, 0]}
-                    name="Percentage of participants"
+            {timeCompletionData.length > 0 ? (
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={timeCompletionData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >
-                    {timeCompletionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+                    <XAxis dataKey="name" stroke="#666" />
+                    <YAxis stroke="#666" />
+                    <Tooltip 
+                      formatter={(value) => [`${value}% of challenges`, 'Percentage']}
+                      contentStyle={{
+                        background: 'rgba(255, 255, 255, 0.9)',
+                        border: '1px solid #ddd',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Bar 
+                      dataKey="value" 
+                      fill="#8884d8" 
+                      radius={[4, 4, 0, 0]}
+                      name="Percentage of challenges"
+                    >
+                      {timeCompletionData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-80 flex items-center justify-center text-gray-500">
+                No completion time data available
+              </div>
+            )}
           </div>
         </div>
       </main>
     </div>
   );
-} 
+}
