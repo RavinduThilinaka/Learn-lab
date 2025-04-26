@@ -240,6 +240,13 @@ export default function Home() {
     return stars;
   };
 
+  // Format time to display only hours and minutes
+  const formatTime = (timeString) => {
+    if (!timeString) return 'N/A';
+    const [hours, minutes] = timeString.split(':');
+    return `${hours}:${minutes}`;
+  };
+
   return (
     <div className="w-full min-h-screen bg-gray-100">
         <Navbar/>
@@ -387,139 +394,136 @@ export default function Home() {
       </div>
 
       {/* Learning Sessions Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto ">
-  <div className="text-center mb-16">
-    <h2 className="text-4xl font-extrabold text-gray-900 mb-4">
-      Upcoming <span className="text-purple-600">Learning Sessions</span>
-    </h2>
-    <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-      Join our interactive learning experiences designed to expand your knowledge and skills.
-    </p>
-  </div>
-
-  {loading ? (
-    <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
-      <span className="ml-3 text-gray-700">Loading sessions...</span>
-    </div>
-  ) : error ? (
-    <div className="bg-red-50 border border-red-200 rounded-xl p-6 max-w-2xl mx-auto text-center">
-      <div className="flex justify-center mb-3">
-        <div className="bg-red-100 p-3 rounded-full">
-          <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
+      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-extrabold text-gray-900 mb-4">
+            Upcoming <span className="text-purple-600">Learning Sessions</span>
+          </h2>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Join our interactive learning experiences designed to expand your knowledge and skills.
+          </p>
         </div>
-      </div>
-      <h3 className="text-xl font-medium text-red-800 mb-2">Error loading sessions</h3>
-      <p className="text-red-600">{error}</p>
-      <button 
-        onClick={() => window.location.reload()} 
-        className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-      >
-        Try Again
-      </button>
-    </div>
-  ) : (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {sessions.map((session) => (
-        <div
-          key={session.id}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100"
-        >
-          {/* Session Header with Category Tag */}
-          <div className="relative">
-            {session.videoBase64 ? (
-              <div className="relative pt-[56.25%] overflow-hidden">
-                <video
-                  className="absolute inset-0 w-full h-full object-cover"
-                  controls
-                  poster={session.thumbnailUrl}
-                  src={`data:video/mp4;base64,${session.videoBase64}`}
-                >
-                  Your browser does not support the video tag.
-                </video>
+
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+            <span className="ml-3 text-gray-700">Loading sessions...</span>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6 max-w-2xl mx-auto text-center">
+            <div className="flex justify-center mb-3">
+              <div className="bg-red-100 p-3 rounded-full">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
               </div>
-            ) : (
-              <div className="bg-gradient-to-r from-purple-400 to-indigo-500 h-48 flex items-center justify-center">
-                <div className="bg-white bg-opacity-20 p-4 rounded-full">
-                  <FaPlay className="text-4xl text-white" />
+            </div>
+            <h3 className="text-xl font-medium text-red-800 mb-2">Error loading sessions</h3>
+            <p className="text-red-600">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {sessions.map((session) => (
+              <div
+                key={session.id}
+                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100"
+              >
+                {/* Session Header with Category Tag */}
+                <div className="relative">
+                  {session.videoBase64 ? (
+                    <div className="relative pt-[56.25%] overflow-hidden">
+                      <video
+                        className="absolute inset-0 w-full h-full object-cover"
+                        controls
+                        poster={session.thumbnailUrl}
+                        src={`data:video/mp4;base64,${session.videoBase64}`}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  ) : (
+                    <div className="bg-gradient-to-r from-purple-400 to-indigo-500 h-48 flex items-center justify-center">
+                      <div className="bg-white bg-opacity-20 p-4 rounded-full">
+                        <FaPlay className="text-4xl text-white" />
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute top-4 right-4">
+                    <span className="bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full">
+                      {session.category || 'Workshop'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Session Content */}
+                <div className="p-6">
+                  <div className="flex items-center mb-3">
+                    <svg className="w-5 h-5 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                    </svg>
+                    <span className="text-gray-600 text-sm font-medium">
+                      {session.rating || '4.8'} ({session.reviews || '24'} reviews)
+                    </span>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{session.sessionTitle}</h3>
+                  <p className="text-gray-700 mb-4 line-clamp-2">{session.description}</p>
+                  
+                  <div className="space-y-3 mb-5">
+                    <div className="flex items-center">
+                      <FaCalendarAlt className="text-gray-400 mr-2" />
+                      <span className="text-sm text-gray-600">
+                        <strong>Date:</strong> {new Date(session.startDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <FaClock className="text-gray-400 mr-2" />
+                      <span className="text-sm text-gray-600">
+                        <strong>Time:</strong> {formatTime(session.endTime) || 'N/A'}
+                      </span>
+                    </div>
+                    {session.instructor && (
+                      <div className="flex items-center">
+                        <FaChalkboardTeacher className="text-gray-400 mr-2" />
+                        <span className="text-sm text-gray-600">
+                          <strong>Instructor:</strong> {session.instructor}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                    <span className="text-lg font-bold text-purple-600">
+                      {session.price ? `$${session.price}` : 'FREE'}
+                    </span>
+                    <button 
+                      onClick={() => handleJoinSession(session)}
+                      className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
+                    >
+                      Join Session
+                    </button>
+                  </div>
                 </div>
               </div>
-            )}
-            <div className="absolute top-4 right-4">
-              <span className="bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full">
-                {session.category || 'Workshop'}
-              </span>
-            </div>
+            ))}
           </div>
-
-          {/* Session Content */}
-          <div className="p-6">
-            <div className="flex items-center mb-3">
-              <svg className="w-5 h-5 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-              </svg>
-              <span className="text-gray-600 text-sm font-medium">
-                {session.rating || '4.8'} ({session.reviews || '24'} reviews)
-              </span>
-            </div>
-            
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{session.sessionTitle}</h3>
-            <p className="text-gray-700 mb-4 line-clamp-2">{session.description}</p>
-            
-            <div className="space-y-3 mb-5">
-              <div className="flex items-center">
-                <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span className="text-sm text-gray-600">
-                  <strong>Starts:</strong> {session.startDate} • {session.startTime}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span className="text-sm text-gray-600">
-                  <strong>Ends:</strong> {session.endDate} • {session.endTime}
-                </span>
-              </div>
-              {session.instructor && (
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                  </svg>
-                  <span className="text-sm text-gray-600">
-                    <strong>Instructor:</strong> {session.instructor}
-                  </span>
-                </div>
-              )}
-            </div>
-            
-            <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-              <span className="text-lg font-bold text-purple-600">
-                {session.price ? `$${session.price}` : 'FREE'}
-              </span>
-              <button className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium">
-                Join Session
-              </button>
-            </div>
+        )}
+        
+        {/* Call to Action */}
+        {!loading && !error && (
+          <div className="mt-16 text-center">
+            <button className="px-8 py-3 bg-white text-purple-600 border-2 border-purple-600 rounded-full font-semibold hover:bg-purple-50 transition-colors">
+              View All Learning Sessions
+            </button>
           </div>
-        </div>
-      ))}
-    </div>
-  )}
-  
-  {/* Call to Action */}
-  {!loading && !error && (
-    <div className="mt-16 text-center">
-      <button className="px-8 py-3 bg-white text-purple-600 border-2 border-purple-600 rounded-full font-semibold hover:bg-purple-50 transition-colors">
-        View All Learning Sessions
-      </button>
-    </div>
-  )}
-</section>
+        )}
+      </section>
 
       {/* Advanced Contact Us Section */}
       <section id="contact" className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
@@ -822,7 +826,7 @@ export default function Home() {
                     <div className="flex items-center">
                       <FaClock className="mr-2 text-purple-600" />
                       <span>
-                        {selectedSession?.startTime} - {selectedSession?.endTime || 'N/A'}
+                        {formatTime(selectedSession?.endTime) || 'N/A'}
                       </span>
                     </div>
                   </div>
