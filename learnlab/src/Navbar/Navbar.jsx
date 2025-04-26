@@ -165,7 +165,7 @@ const Navbar = () => {
   {['Home', 'About', 'Category', 'Contact','Quiz'].map((item) => {
     let path = '/';
     if (item === 'Home') {
-      path = '/';
+      path = '/Home';
     } else if (item === 'Category') {
       path = '/CategoryCardsPage'; 
     } else if (item === 'Quiz') {
