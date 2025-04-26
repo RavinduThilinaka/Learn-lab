@@ -85,9 +85,22 @@ const SkillCategoryForm = () => {
     }
   };
 
+  const categoryOptions = [
+    '🎨 Creative Categories',
+    '💼 Business & Career',
+    '💻 Technology',
+    '🧠 Personal Development',
+    '🌍 Languages',
+    '📚 Academic Skills',
+    '🛠️ Technical Skills',
+    '🧘 Health & Wellness',
+    '🎯 Productivity & Organization',
+    '🛍️ Sales & Marketing'
+  ];
+
   return (
     <div className="flex min-h-screen bg-white text-gray-800">
-      {/* Sidebar - Purple Only */}
+      {/* Sidebar */}
       <aside className="w-72 fixed left-0 top-0 h-full bg-purple-800 text-white p-6 flex flex-col justify-between">
         <div>
           <div className="flex flex-col items-center mb-8">
@@ -116,24 +129,16 @@ const SkillCategoryForm = () => {
             </Link>
             
             <Link 
-              to="/ViewAllSessions" 
+              to="/CategoryListPage" 
               className="flex items-center gap-3 p-4 rounded-xl bg-purple-900 hover:bg-purple-700 transition-all duration-300 group"
             >
               <div className="w-8 h-8 flex items-center justify-center bg-purple-400 rounded-lg group-hover:bg-purple-300 transition-colors">
                 <FaCalendarAlt className="text-white" />
               </div>
-              <span className="font-medium">View Sessions</span>
+              <span className="font-medium">View  Category</span>
             </Link>
             
-            <Link 
-              to="/SkillCategoryForm" 
-              className="flex items-center gap-3 p-4 rounded-xl bg-purple-700 hover:bg-purple-600 transition-all duration-300 group"
-            >
-              <div className="w-8 h-8 flex items-center justify-center bg-purple-500 rounded-lg group-hover:bg-purple-400 transition-colors">
-                <FaChartLine className="text-white" />
-              </div>
-              <span className="font-medium">Add Category</span>
-            </Link>
+        
             
             <Link 
               to="/AnalyticsDashboard" 
@@ -162,7 +167,7 @@ const SkillCategoryForm = () => {
         </button>
       </aside>
 
-      {/* Main Content - White Background */}
+      {/* Main Content */}
       <main className="flex-1 ml-72 p-8 bg-white">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-3xl font-bold mb-6 text-gray-800">Add New Skill Category</h1>
@@ -180,19 +185,24 @@ const SkillCategoryForm = () => {
             )}
 
             <form onSubmit={handleSubmit}>
+              {/* Updated to SELECT dropdown */}
               <div className="mb-4">
                 <label className="block text-gray-700 mb-2 font-medium" htmlFor="categoryTitle">
                   Category Title
                 </label>
-                <input
-                  type="text"
+                <select
                   id="categoryTitle"
                   name="categoryTitle"
                   value={formData.categoryTitle}
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800"
                   required
-                />
+                >
+                  <option value="">-- Select a Category Title --</option>
+                  {categoryOptions.map((option, index) => (
+                    <option key={index} value={option}>{option}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="mb-4">

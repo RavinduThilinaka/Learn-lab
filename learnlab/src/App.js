@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home/Home'; // Import the Home component
 import VideoBackgroundPage  from './LaunchingScreen/Loading';
+import CategoryCardsPage from './Home/Category';
 import AdminManagementDashboard from './Dashboard/AdminDashboard'
 
 import LearningSessionScheduling from './Learning_Session/LearningForm';
@@ -42,6 +43,8 @@ const App = () => {
         <Route path="/navbar" element={<Navbar />} />
         <Route path="/Home" element={<Home />} />
         <Route path="/" element={<VideoBackgroundPage/>}/>
+        <Route path="/CategoryCardsPage" element={<CategoryCardsPage/>}/>
+
         <Route path="/AdminManagementDashboard" element={<AdminManagementDashboard/>}/>
 
         <Route path="/LearningSessionScheduling" element={<LearningSessionScheduling/>}/>
