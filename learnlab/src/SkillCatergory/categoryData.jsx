@@ -163,79 +163,89 @@ const CategoryListPage = () => {
     }));
   };
 
-  // Generate PDF function - Updated version
   const generatePDF = () => {
-    const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4'
+    // Import jsPDF and autoTable dynamically to ensure proper initialization
+    import('jspdf').then((jsPDFModule) => {
+      import('jspdf-autotable').then((autoTableModule) => {
+        const { jsPDF } = jsPDFModule;
+        const autoTable = autoTableModule.default;
+        
+        const doc = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+        
+        // Title
+        doc.setFontSize(20);
+        doc.setTextColor(40);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Category List Report', 105, 20, { align: 'center' });
+        
+        // Date
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 27, { align: 'center' });
+        
+        // Table data
+        const tableData = filteredCategories.map(category => [
+          category.categoryTitle || 'N/A',
+          category.categoryName || 'N/A',
+          category.description ? category.description.substring(0, 50) + (category.description.length > 50 ? '...' : '') : 'N/A',
+          category.active ? 'Active' : 'Inactive'
+        ]);
+        
+        // AutoTable
+        autoTable(doc, {
+          startY: 35,
+          head: [['Title', 'Name', 'Description', 'Status']],
+          body: tableData,
+          theme: 'grid',
+          headStyles: {
+            fillColor: [128, 0, 128], // Purple color
+            textColor: 255,
+            fontSize: 10,
+            fontStyle: 'bold'
+          },
+          alternateRowStyles: {
+            fillColor: [245, 245, 245]
+          },
+          styles: {
+            fontSize: 9,
+            cellPadding: 2,
+            overflow: 'linebreak',
+            valign: 'middle'
+          },
+          columnStyles: {
+            0: { cellWidth: 30 },
+            1: { cellWidth: 30 },
+            2: { cellWidth: 80 },
+            3: { cellWidth: 20 }
+          },
+          margin: { top: 40 }
+        });
+        
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.setTextColor(150);
+          doc.text(
+            `Page ${i} of ${pageCount}`,
+            200,
+            290,
+            { align: 'right' }
+          );
+        }
+        
+        doc.save('categories_report.pdf');
+      });
+    }).catch(error => {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
     });
-    
-    // Title
-    doc.setFontSize(20);
-    doc.setTextColor(40);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Category List Report', 105, 20, { align: 'center' });
-    
-    // Date
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 27, { align: 'center' });
-    
-    // Table data
-    const tableData = filteredCategories.map(category => [
-      category.categoryTitle || 'N/A',
-      category.categoryName || 'N/A',
-      category.description ? category.description.substring(0, 50) + (category.description.length > 50 ? '...' : '') : 'N/A',
-      category.active ? 'Active' : 'Inactive'
-    ]);
-    
-    // AutoTable
-    doc.autoTable({
-      startY: 35,
-      head: [['Title', 'Name', 'Description', 'Status']],
-      body: tableData,
-      theme: 'grid',
-      headStyles: {
-        fillColor: [128, 0, 128], // Purple color
-        textColor: 255,
-        fontSize: 10,
-        fontStyle: 'bold'
-      },
-      alternateRowStyles: {
-        fillColor: [245, 245, 245]
-      },
-      styles: {
-        fontSize: 9,
-        cellPadding: 2,
-        overflow: 'linebreak',
-        valign: 'middle'
-      },
-      columnStyles: {
-        0: { cellWidth: 30 },
-        1: { cellWidth: 30 },
-        2: { cellWidth: 80 },
-        3: { cellWidth: 20 }
-      },
-      margin: { top: 40 }
-    });
-    
-    // Footer
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(150);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        200,
-        290,
-        { align: 'right' }
-      );
-    }
-    
-    doc.save('categories_report.pdf');
   };
 
   if (loading) {
