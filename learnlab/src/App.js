@@ -30,6 +30,7 @@ import Chatbot from './Chatbot/Chatbot';
 import ChatForm from './Chatbot/ChatForm';
 import ChatMessage from './Chatbot/ChatMessage';
 import ViewChallenge from './SkillChallenge/ViewChallange';
+import LearningSessionViewer from './Learning_Session/LearningSessionViewer';
 
 
 
@@ -70,6 +71,8 @@ const App = () => {
         <Route path="/bot" element={<Chatbot/>}/>
         <Route path="/chatform" element={<ChatForm/>}/>
         <Route path="/chatmessage" element={<ChatMessage/>}/>
+
+        <Route path="/display" element={<LearningSessionViewer/>}/>
       </Routes>
     </Router>
   );
