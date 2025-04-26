@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaSearch, FaArrowRight, FaPlus } from 'react-icons/fa';
+import { FaSearch, FaArrowRight, FaPlus, FaCommentDots } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faFacebookF, 
@@ -15,6 +15,8 @@ import Logo from '../Images/logo1.png';
 import Navbar from '../Navbar/Navbar';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import FeedbackForm from '../Feedback/FeedbackForm';
+; // Make sure you have this component
 
 const CategoryCardsPage = () => {
   const [categories, setCategories] = useState([]);
@@ -23,6 +25,8 @@ const CategoryCardsPage = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackType, setFeedbackType] = useState('general');
 
   const fetchCategories = async () => {
     try {
@@ -95,6 +99,11 @@ const CategoryCardsPage = () => {
     setActiveFilter(status);
   };
 
+  const openFeedback = (type) => {
+    setFeedbackType(type);
+    setShowFeedback(true);
+  };
+
   if (loading && categories.length === 0) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-50">
@@ -125,13 +134,75 @@ const CategoryCardsPage = () => {
       <Navbar />
       <ToastContainer position="top-right" autoClose={5000} />
 
+      {/* Feedback Boxes */}
+      <div className="fixed right-6 bottom-6 z-50 flex flex-col space-y-4">
+        {/* General Feedback */}
+        <div 
+          className="bg-purple-600 text-white p-4 rounded-lg shadow-xl cursor-pointer hover:bg-purple-700 transition-colors flex items-center"
+          onClick={() => openFeedback('general')}
+        >
+          <FaCommentDots className="text-xl mr-2" />
+          <span>Feedback</span>
+        </div>
+        
+        {/* Bug Report */}
+        <div 
+          className="bg-red-500 text-white p-4 rounded-lg shadow-xl cursor-pointer hover:bg-red-600 transition-colors flex items-center"
+          onClick={() => openFeedback('bug')}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          <span>Report Bug</span>
+        </div>
+        
+        {/* Suggestion */}
+        <div 
+          className="bg-blue-500 text-white p-4 rounded-lg shadow-xl cursor-pointer hover:bg-blue-600 transition-colors flex items-center"
+          onClick={() => openFeedback('suggestion')}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+          </svg>
+          <span>Suggestion</span>
+        </div>
+      </div>
+
+      {/* Feedback Modal */}
+      {showFeedback && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-gray-800">
+                  {feedbackType === 'bug' ? 'Report a Bug' : 
+                   feedbackType === 'suggestion' ? 'Share a Suggestion' : 
+                   'Give Us Feedback'}
+                </h3>
+                <button 
+                  onClick={() => setShowFeedback(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <FeedbackForm 
+                type={feedbackType} 
+                onClose={() => setShowFeedback(false)}
+                onSuccess={() => {
+                  toast.success('Thank you for your feedback!');
+                  setShowFeedback(false);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
-        
-            
-         
-
         {/* Search and Filter Bar */}
         <div className="mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="relative w-full md:w-1/2">
