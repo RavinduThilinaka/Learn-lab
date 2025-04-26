@@ -128,12 +128,9 @@ const CategoryCardsPage = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
-        <section className="mb-12 text-center">
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">Explore Our Skill Categories</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Browse through our diverse range of skill categories and find challenges that match your interests.
-          </p>
-        </section>
+        
+            
+         
 
         {/* Search and Filter Bar */}
         <div className="mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
