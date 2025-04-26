@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaHome, FaCog, FaQuestionCircle, FaSignOutAlt, FaChartLine, FaPlus, FaCalendarAlt, FaEdit, FaTrash, FaEye, FaVideo, FaFilePdf } from "react-icons/fa";
+import { FaHome, FaCog, FaQuestionCircle, FaSignOutAlt, FaChartLine, FaPlus, FaCalendarAlt, FaEdit, FaTrash, FaEye, FaVideo, FaFilePdf, FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Logo from "../Images/logo1.png";
 import axios from 'axios';
@@ -10,6 +10,7 @@ import autoTable from 'jspdf-autotable';
 
 export default function ViewAllSessions() {
   const [sessions, setSessions] = useState([]);
+  const [filteredSessions, setFilteredSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedSession, setSelectedSession] = useState(null);
@@ -25,16 +26,30 @@ export default function ViewAllSessions() {
     videoUrl: ''
   });
   const [videoFile, setVideoFile] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const tableRef = useRef();
 
   useEffect(() => {
     fetchSessions();
   }, []);
 
+  useEffect(() => {
+    if (searchTerm === '') {
+      setFilteredSessions(sessions);
+    } else {
+      const filtered = sessions.filter(session =>
+        session.sessionTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (session.description && session.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      setFilteredSessions(filtered);
+    }
+  }, [searchTerm, sessions]);
+
   const fetchSessions = async () => {
     try {
       const response = await axios.get('http://localhost:8080/public/getAllSession');
       setSessions(response.data);
+      setFilteredSessions(response.data);
       setLoading(false);
     } catch (err) {
       console.error('Error fetching sessions:', err);
@@ -81,7 +96,9 @@ export default function ViewAllSessions() {
     
     try {
       await axios.delete(`http://localhost:8080/public/deleteSession/${sessionId}`);
-      setSessions(sessions.filter(session => session.id !== sessionId));
+      const updatedSessions = sessions.filter(session => session.id !== sessionId);
+      setSessions(updatedSessions);
+      setFilteredSessions(updatedSessions);
       showSuccessToast('Session deleted successfully!');
     } catch (err) {
       console.error('Error deleting session:', err);
@@ -152,10 +169,12 @@ export default function ViewAllSessions() {
         }
       );
       
-      setSessions(sessions.map(session => 
+      const updatedSessions = sessions.map(session => 
         session.id === selectedSession.id ? response.data : session
-      ));
+      );
       
+      setSessions(updatedSessions);
+      setFilteredSessions(updatedSessions);
       setShowEditModal(false);
       setVideoFile(null);
       showSuccessToast('Session updated successfully!');
@@ -166,40 +185,34 @@ export default function ViewAllSessions() {
   };
 
   const generatePDFReport = () => {
-    // Create a new PDF document
     const doc = new jsPDF({
       orientation: 'landscape'
     });
 
-    // Add logo (you'll need to convert your logo to base64 or use a URL)
-    // For demonstration, we'll just add text as a placeholder
     doc.setFontSize(20);
     doc.setTextColor(40);
     doc.text('Learning Session Report', 105, 20, { align: 'center' });
     doc.setFontSize(12);
     doc.text('Generated on: ' + new Date().toLocaleDateString(), 105, 30, { align: 'center' });
     
-    // Add a line separator
     doc.setDrawColor(100, 100, 100);
     doc.setLineWidth(0.5);
     doc.line(20, 35, 280, 35);
 
-    // Prepare table data
-    const tableData = sessions.map(session => [
+    const tableData = filteredSessions.map(session => [
       session.sessionTitle,
       formatDateTime(session.startDate, session.startTime),
       session.endDate && session.endTime ? formatDateTime(session.endDate, session.endTime) : 'N/A',
       session.description || 'No description'
     ]);
 
-    // Add table using autoTable plugin
     autoTable(doc, {
       head: [['Session Title', 'Start Date/Time', 'End Date/Time', 'Description']],
       body: tableData,
       startY: 40,
       theme: 'grid',
       headStyles: {
-        fillColor: [103, 58, 183], // Purple color
+        fillColor: [103, 58, 183],
         textColor: 255,
         fontStyle: 'bold'
       },
@@ -209,7 +222,6 @@ export default function ViewAllSessions() {
       margin: { top: 40 }
     });
 
-    // Add footer
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -218,14 +230,13 @@ export default function ViewAllSessions() {
       doc.text(`Page ${i} of ${pageCount}`, 280, 200, { align: 'right' });
     }
 
-    // Save the PDF
     doc.save('learning-sessions-report.pdf');
   };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-purple-900 to-gray-900 text-white">
-         {/* Sidebar */}
-         <aside className="w-72 fixed left-0 top-0 h-full bg-gradient-to-b from-purple-800 to-gray-900 text-white p-6 flex flex-col justify-between border-r border-purple-500/20">
+      {/* Sidebar */}
+      <aside className="w-72 fixed left-0 top-0 h-full bg-gradient-to-b from-purple-800 to-gray-900 text-white p-6 flex flex-col justify-between border-r border-purple-500/20">
         <div>
           <div className="flex flex-col items-center mb-8">
             <div className="relative group">
@@ -325,14 +336,28 @@ export default function ViewAllSessions() {
                       <FaCalendarAlt className="text-purple-200" />
                       Scheduled Sessions
                     </h2>
-                    <p className="text-purple-100 mt-1">{sessions.length} sessions found</p>
+                    <p className="text-purple-100 mt-1">{filteredSessions.length} sessions found</p>
                   </div>
-                  <button
-                    onClick={generatePDFReport}
-                    className="px-4 py-2 bg-white text-purple-700 font-medium rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-md flex items-center gap-2"
-                  >
-                    <FaFilePdf /> Generate Report
-                  </button>
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FaSearch className="text-purple-200" />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Search sessions..."
+                        className="pl-10 pr-4 py-2 bg-white/20 text-white placeholder-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 focus:bg-white/30 transition-all duration-300"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                    <button
+                      onClick={generatePDFReport}
+                      className="px-4 py-2 bg-white text-purple-700 font-medium rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-md flex items-center gap-2"
+                    >
+                      <FaFilePdf /> Generate Report
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -356,11 +381,16 @@ export default function ViewAllSessions() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {sessions.length > 0 ? (
-                      sessions.map((session) => (
+                    {filteredSessions.length > 0 ? (
+                      filteredSessions.map((session) => (
                         <tr key={session.id} className="hover:bg-gray-50 transition-colors">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">{session.sessionTitle}</div>
+                            {session.description && (
+                              <div className="text-xs text-gray-500 mt-1 truncate max-w-xs">
+                                {session.description}
+                              </div>
+                            )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
@@ -401,7 +431,7 @@ export default function ViewAllSessions() {
                     ) : (
                       <tr>
                         <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">
-                          No sessions found. Create your first session!
+                          {searchTerm ? 'No matching sessions found' : 'No sessions found. Create your first session!'}
                         </td>
                       </tr>
                     )}
@@ -412,8 +442,8 @@ export default function ViewAllSessions() {
               {/* Table Footer */}
               <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-between items-center">
                 <div className="text-sm text-gray-500">
-                  Showing <span className="font-medium">1</span> to <span className="font-medium">{sessions.length}</span> of{' '}
-                  <span className="font-medium">{sessions.length}</span> sessions
+                  Showing <span className="font-medium">1</span> to <span className="font-medium">{filteredSessions.length}</span> of{' '}
+                  <span className="font-medium">{filteredSessions.length}</span> sessions
                 </div>
                 <div className="flex space-x-2">
                   <Link

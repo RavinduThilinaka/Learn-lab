@@ -10,7 +10,7 @@ const QuizIntroPage = () => {
   };
 
   const continueToQuiz = () => {
-    navigate('/quiz');
+    navigate('/quize');
   };
 
   return (

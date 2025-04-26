@@ -161,21 +161,36 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Navigation Links */}
             <nav className="hidden md:flex space-x-8">
-              {['Home', 'About', 'Teach', 'Contact'].map((item) => (
-                <Link 
-                  key={item}
-                  to={`/${item.toLowerCase()}`}
-                  className="relative text-gray-600 hover:text-purple-700 px-2 py-1 text-1xl font-medium transition-colors duration-300 group "
-                  onMouseEnter={() => setIsHovered(item)}
-                  onMouseLeave={() => setIsHovered(null)}
-                >
-                  {item}
-                  <span className={`absolute bottom-0 left-0 h-0.5 bg-purple-600 transition-all duration-300 ${isHovered === item ? 'w-full' : 'w-0'}`}></span>
-                </Link>
-              ))}
-            </nav>
+  {['Home', 'About', 'Category', 'Contact','Quiz'].map((item) => {
+    let path = '/';
+    if (item === 'Home') {
+      path = '/';
+    } else if (item === 'Category') {
+      path = '/CategoryCardsPage'; 
+    } else if (item === 'Quiz') {
+      path = '/qizeintro'; // custom path for Category
+    } else {
+      path = `/${item.toLowerCase()}`; // default path
+    }
+
+    return (
+      <Link 
+        key={item}
+        to={path}
+        className="relative text-gray-600 hover:text-purple-700 px-2 py-1 text-lg font-medium transition-colors duration-300 group"
+        onMouseEnter={() => setIsHovered(item)}
+        onMouseLeave={() => setIsHovered(null)}
+      >
+        {item}
+        <span className={`absolute bottom-0 left-0 h-0.5 bg-purple-600 transition-all duration-300 ${
+          isHovered === item ? 'w-full' : 'w-0'
+        }`} />
+      </Link>
+    );
+  })}
+</nav>
+
 
             {/* Right Side */}
             <div className="flex items-center space-x-4">

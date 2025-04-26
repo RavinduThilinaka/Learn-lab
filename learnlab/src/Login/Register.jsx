@@ -69,7 +69,7 @@ export default function SignupForm() {
       setShowSuccessPopup(true); 
       setTimeout(() => {
         setShowSuccessPopup(false);
-        navigate("/LoginForm"); 
+        navigate("/Login"); 
       }, 3000); 
     } catch (error) {
       console.error("Error registering user", error);
