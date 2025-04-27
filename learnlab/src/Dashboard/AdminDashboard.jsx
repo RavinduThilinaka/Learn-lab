@@ -142,7 +142,7 @@ export default function AdminManagementDashboard() {
           
           {/* Contact Details Card */}
           <Link 
-            to="/contact-details" 
+            to="/Contact" 
             className="flex flex-col items-center p-6 h-40 bg-gradient-to-b from-purple-600 to-black shadow-lg rounded-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl"
           >
             <FaPhone className="text-white text-3xl mb-3 animate-pulse" />

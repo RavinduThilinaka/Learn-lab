@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiSearch, FiUser, FiShoppingCart, FiLogIn, FiUserPlus, FiLogOut } from "react-icons/fi";
+import { FiSearch, FiUser, FiShoppingCart, FiLogIn, FiUserPlus, FiLogOut, FiHome, FiInfo, FiMail } from "react-icons/fi";
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -30,6 +30,21 @@ const Navbar = () => {
         window.location.reload();
       }, 1200);
     }, 1800);
+  };
+
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      // Get the navbar height to offset the scroll position
+      const navbarHeight = document.querySelector('header').offsetHeight;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (
@@ -162,35 +177,73 @@ const Navbar = () => {
             </div>
 
             <nav className="hidden md:flex space-x-8">
-  {['Home', 'About', 'Category', 'Contact','Quiz'].map((item) => {
-    let path = '/';
-    if (item === 'Home') {
-      path = '/Home';
-    } else if (item === 'Category') {
-      path = '/CategoryCardsPage'; 
-    } else if (item === 'Quiz') {
-      path = '/qizeintro'; // custom path for Category
-    } else {
-      path = `/${item.toLowerCase()}`; // default path
-    }
+              {/* Home Link */}
+              <button
+                onClick={() => scrollToSection('home')}
+                className="relative text-gray-600 hover:text-purple-700 px-2 py-1 text-lg font-medium transition-colors duration-300 group flex items-center"
+                onMouseEnter={() => setIsHovered('Home')}
+                onMouseLeave={() => setIsHovered(null)}
+              >
+                <FiHome className="mr-1" />
+                Home
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-purple-600 transition-all duration-300 ${
+                  isHovered === 'Home' ? 'w-full' : 'w-0'
+                }`} />
+              </button>
 
-    return (
-      <Link 
-        key={item}
-        to={path}
-        className="relative text-gray-600 hover:text-purple-700 px-2 py-1 text-lg font-medium transition-colors duration-300 group"
-        onMouseEnter={() => setIsHovered(item)}
-        onMouseLeave={() => setIsHovered(null)}
-      >
-        {item}
-        <span className={`absolute bottom-0 left-0 h-0.5 bg-purple-600 transition-all duration-300 ${
-          isHovered === item ? 'w-full' : 'w-0'
-        }`} />
-      </Link>
-    );
-  })}
-</nav>
+              {/* About Link */}
+              <button
+                onClick={() => scrollToSection('about')}
+                className="relative text-gray-600 hover:text-purple-700 px-2 py-1 text-lg font-medium transition-colors duration-300 group flex items-center"
+                onMouseEnter={() => setIsHovered('About')}
+                onMouseLeave={() => setIsHovered(null)}
+              >
+                <FiInfo className="mr-1" />
+                About
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-purple-600 transition-all duration-300 ${
+                  isHovered === 'About' ? 'w-full' : 'w-0'
+                }`} />
+              </button>
 
+              {/* Contact Link */}
+              <button
+                onClick={() => scrollToSection('contact')}
+                className="relative text-gray-600 hover:text-purple-700 px-2 py-1 text-lg font-medium transition-colors duration-300 group flex items-center"
+                onMouseEnter={() => setIsHovered('Contact')}
+                onMouseLeave={() => setIsHovered(null)}
+              >
+                <FiMail className="mr-1" />
+                Contact
+                <span className={`absolute bottom-0 left-0 h-0.5 bg-purple-600 transition-all duration-300 ${
+                  isHovered === 'Contact' ? 'w-full' : 'w-0'
+                }`} />
+              </button>
+
+              {/* Other Navigation Links */}
+              {['Category', 'Quiz'].map((item) => {
+                let path = '/';
+                if (item === 'Category') {
+                  path = '/CategoryCardsPage'; 
+                } else if (item === 'Quiz') {
+                  path = '/qizeintro';
+                }
+
+                return (
+                  <Link 
+                    key={item}
+                    to={path}
+                    className="relative text-gray-600 hover:text-purple-700 px-2 py-1 text-lg font-medium transition-colors duration-300 group"
+                    onMouseEnter={() => setIsHovered(item)}
+                    onMouseLeave={() => setIsHovered(null)}
+                  >
+                    {item}
+                    <span className={`absolute bottom-0 left-0 h-0.5 bg-purple-600 transition-all duration-300 ${
+                      isHovered === item ? 'w-full' : 'w-0'
+                    }`} />
+                  </Link>
+                );
+              })}
+            </nav>
 
             {/* Right Side */}
             <div className="flex items-center space-x-4">
