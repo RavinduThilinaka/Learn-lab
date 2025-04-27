@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { FaSearch, FaRobot, FaShoppingCart, FaCalendarAlt, FaClock, FaPlay, FaTimes, FaMapMarkerAlt, FaPhone, FaEnvelope, FaPaperPlane, FaInfinity, FaChalkboardTeacher, FaStar, FaRegStar, FaStarHalfAlt, FaComment } from "react-icons/fa";
+import { FaSearch, FaRobot, FaShoppingCart, FaCalendarAlt, FaClock, FaPlay, FaTimes, FaMapMarkerAlt, FaPhone, FaEnvelope, FaPaperPlane, FaInfinity, FaChalkboardTeacher, FaStar, FaRegStar, FaStarHalfAlt, FaComment, FaMoon, FaSun } from "react-icons/fa";
 import class1Image from '../Images/b1.jpg';
 import class2Image from '../Images/b2.jpg';
 import class3Image from '../Images/b3.jpg';
@@ -27,6 +27,7 @@ export default function Home() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalError, setModalError] = useState('');
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -245,25 +246,39 @@ export default function Home() {
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateForm();
     setFormErrors(errors);
     
     if (Object.keys(errors).length === 0) {
-      console.log('Form submitted:', formData);
-      setFormSubmitted(true);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: ''
-      });
-      
-      setTimeout(() => {
-        setFormSubmitted(false);
-      }, 5000);
+      try {
+        const response = await axios.post('http://localhost:8080/public/addContact', {
+          name: formData.name,
+          email: formData.email,
+          mobile: formData.phone ? parseInt(formData.phone.replace(/\D/g, '')) : null,
+          subject: formData.subject,
+          message: formData.message
+        });
+
+        if (response.status === 200) {
+          setFormSubmitted(true);
+          setFormData({
+            name: '',
+            email: '',
+            phone: '',
+            subject: '',
+            message: ''
+          });
+          
+          setTimeout(() => {
+            setFormSubmitted(false);
+          }, 5000);
+        }
+      } catch (error) {
+        console.error('Error submitting contact form:', error);
+        setFormErrors({ submit: 'Failed to submit form. Please try again.' });
+      }
     }
   };
 
@@ -293,91 +308,107 @@ export default function Home() {
     return `${hours}:${minutes}`;
   };
 
+  // Add dark mode toggle handler
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+  };
+
   return (
-    <div className="w-full min-h-screen bg-gray-100">
+    <div className={`w-full min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100'}`}>
       <Navbar/>
+      
+      {/* Dark Mode Toggle Button */}
+      <button
+        onClick={toggleDarkMode}
+        className="fixed top-4 right-4 z-50 p-3 rounded-full bg-purple-600 text-white shadow-lg hover:bg-purple-700 transition-colors duration-300"
+      >
+        {isDarkMode ? <FaSun className="text-xl" /> : <FaMoon className="text-xl" />}
+      </button>
       
       {/* Hero Section with Parallax and Fade-in */}
       <section
-  ref={heroRef}
-  className={`relative w-full h-[70vh] md:h-[80vh] flex items-center justify-center bg-cover bg-center bg-fixed transition-all duration-1000 ${
-    isHeroVisible ? 'opacity-100' : 'opacity-0'
-  }`}
-  style={{ 
-    backgroundImage: `url(${images[currentIndex]})`,
-    backgroundAttachment: 'fixed',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: 'cover'
-  }}
->
-  <div className={`absolute inset-0 bg-black opacity-50 transition-opacity duration-1000 ${
-    isHeroVisible ? 'opacity-50' : 'opacity-0'
-  }`} />
-
-  <div className={`relative text-center text-white px-6 transform transition-all duration-1000 ${
-    isHeroVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-  }`}>
-    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
-      Unlock Your <span className="text-yellow-500">Creativity</span>
-    </h1>
-    <p className="text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-2xl mx-auto px-4">
-      Learn from thousands of inspiring classes to enhance your skills.
-    </p>
-    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-      <Link 
-        className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 md:px-6 md:py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
-        to={"/bot"}
+        id="home"
+        ref={heroRef}
+        className={`relative w-full h-[70vh] md:h-[80vh] flex items-center justify-center bg-cover bg-center bg-fixed transition-all duration-1000 ${
+          isHeroVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+        style={{ 
+          backgroundImage: `url(${images[currentIndex]})`,
+          backgroundAttachment: 'fixed',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover'
+        }}
       >
-        <FaRobot className="h-5 w-5" />
-        <span>AI Assistant</span>
-      </Link>
-      <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 md:px-8 md:py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-        Get Started
-      </button>
-    </div>
-  </div>
-</section>
+        <div className={`absolute inset-0 bg-black opacity-50 transition-opacity duration-1000 ${
+          isHeroVisible ? 'opacity-50' : 'opacity-0'
+        }`} />
 
-{/* About Section with Slide-up Animation */}
-<section 
-  ref={aboutRef}
-  className={`py-12 md:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-all duration-1000 ${
-    isAboutVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
-  }`}
->
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-    <div className={`transition-all duration-700 delay-150 ${
-      isAboutVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
-    }`}>
-      <img
-        src={aboutImage}
-        alt="About SkillShare"
-        className="rounded-xl md:rounded-2xl shadow-lg md:shadow-xl w-full h-auto object-cover transform hover:scale-105 transition-transform duration-500"
-      />
-    </div>
-    <div className={`transition-all duration-700 delay-300 ${
-      isAboutVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
-    }`}>
-      <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
-        About <span className="text-purple-600">SkillShare</span>
-      </h2>
-      <p className="text-gray-700 text-base md:text-lg mb-4 md:mb-6">
-        SkillShare is an online learning community where millions come together to take 
-        the next step in their creative journey. With thousands of inspiring classes taught 
-        by industry experts, learners explore topics like design, business, photography, tech, 
-        and more.
-      </p>
-      <p className="text-gray-700 text-base md:text-lg">
-        Whether you're a beginner or a seasoned professional, SkillShare empowers you to learn 
-        at your own pace, connect with a passionate community, and build skills that matter.
-      </p>
-    </div>
-  </div>
-</section>
+        <div className={`relative text-center text-white px-6 transform transition-all duration-1000 ${
+          isHeroVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+        }`}>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
+            Unlock Your <span className="text-yellow-500">Creativity</span>
+          </h1>
+          <p className="text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-2xl mx-auto px-4">
+            Learn from thousands of inspiring classes to enhance your skills.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link 
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 md:px-6 md:py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+              to={"/bot"}
+            >
+              <FaRobot className="h-5 w-5" />
+              <span>AI Assistant</span>
+            </Link>
+            <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 md:px-8 md:py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              Get Started
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section with Slide-up Animation */}
+      <section 
+        id="about"
+        ref={aboutRef}
+        className={`py-12 md:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-all duration-1000 ${
+          isAboutVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
+        } ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+          <div className={`transition-all duration-700 delay-150 ${
+            isAboutVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+          }`}>
+            <img
+              src={aboutImage}
+              alt="About SkillShare"
+              className="rounded-xl md:rounded-2xl shadow-lg md:shadow-xl w-full h-auto object-cover transform hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+          <div className={`transition-all duration-700 delay-300 ${
+            isAboutVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
+          }`}>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
+              About <span className="text-purple-600">SkillShare</span>
+            </h2>
+            <p className="text-gray-700 text-base md:text-lg mb-4 md:mb-6">
+              SkillShare is an online learning community where millions come together to take 
+              the next step in their creative journey. With thousands of inspiring classes taught 
+              by industry experts, learners explore topics like design, business, photography, tech, 
+              and more.
+            </p>
+            <p className="text-gray-700 text-base md:text-lg">
+              Whether you're a beginner or a seasoned professional, SkillShare empowers you to learn 
+              at your own pace, connect with a passionate community, and build skills that matter.
+            </p>
+          </div>
+        </div>
+      </section>
       
       {/* Featured Courses with Fade-in and Staggered Animation */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 text-center bg-gray-50">
+      <section className={`py-16 px-4 sm:px-6 lg:px-8 text-center ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className={`max-w-7xl mx-auto transition-all duration-1000 ${
           isAboutVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
         }`}>
@@ -409,7 +440,7 @@ export default function Home() {
       {/* Features Section with Card Flip Animation */}
       <section 
         ref={featuresRef}
-        className="py-20 px-4 sm:px-6 lg:px-8 bg-white"
+        className={`py-20 px-4 sm:px-6 lg:px-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
       >
         <div className={`max-w-7xl mx-auto transition-all duration-1000 ${
           isFeaturesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
@@ -465,7 +496,9 @@ export default function Home() {
       {/* Team Section with Parallax Effect */}
       <section 
         ref={teamRef}
-        className="relative py-28 px-4 sm:px-6 lg:px-8 text-white bg-fixed bg-cover bg-center"
+        className={`relative py-28 px-4 sm:px-6 lg:px-8 text-white bg-fixed bg-cover bg-center ${
+          isDarkMode ? 'bg-gray-900' : ''
+        }`}
         style={{ backgroundImage: `url(${teamImage})` }}
       >
         <div className={`absolute inset-0 bg-gradient-to-r from-purple-900/90 to-black/90 transition-opacity duration-1000 ${
@@ -505,7 +538,7 @@ export default function Home() {
       {/* Learning Sessions Section with Staggered Card Animations */}
       <section 
         ref={sessionsRef}
-        className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50"
+        className={`py-20 px-4 sm:px-6 lg:px-8 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}
       >
         <div className={`max-w-7xl mx-auto transition-all duration-1000 ${
           isSessionsVisible ? 'opacity-100' : 'opacity-0'
@@ -637,7 +670,7 @@ export default function Home() {
       {/* Testimonials Section with 3D Flip Effect */}
       <section 
         ref={testimonialsRef}
-        className="py-20 px-4 sm:px-6 lg:px-8 bg-white"
+        className={`py-20 px-4 sm:px-6 lg:px-8 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
       >
         <div className={`max-w-7xl mx-auto transition-all duration-1000 ${
           isTestimonialsVisible ? 'opacity-100' : 'opacity-0'
@@ -716,7 +749,7 @@ export default function Home() {
       <section 
         ref={contactRef}
         id="contact" 
-        className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 overflow-hidden"
+        className={`relative py-20 px-4 sm:px-6 lg:px-8 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} overflow-hidden`}
       >
         <div className={`max-w-7xl mx-auto relative z-10 transition-all duration-1000 ${
           isContactVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
@@ -933,7 +966,7 @@ export default function Home() {
       {/* Video Modal with Enhanced Animation */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4 animate-fadeIn">
-          <div className="relative w-full max-w-4xl bg-white rounded-lg overflow-hidden transform transition-all duration-300 scale-100">
+          <div className={`relative w-full max-w-4xl ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white'} rounded-lg overflow-hidden transform transition-all duration-300 scale-100`}>
             <button 
               onClick={closeModal}
               className="absolute top-4 right-4 z-10 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-100 transition-all"
@@ -992,7 +1025,7 @@ export default function Home() {
       )}
 
       {/* Footer with Gradient Animation */}
-      <footer className="relative bg-gradient-to-r from-purple-600 via-purple-700 to-black text-white py-12 overflow-hidden">
+      <footer className={`relative ${isDarkMode ? 'bg-gray-800' : 'bg-gradient-to-r from-purple-600 via-purple-700 to-black'} text-white py-12 overflow-hidden`}>
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
@@ -1149,6 +1182,44 @@ export default function Home() {
         }
         .delay-500 {
           transition-delay: 500ms;
+        }
+
+        /* Dark mode specific styles */
+        .dark {
+          --tw-bg-opacity: 1;
+          --tw-text-opacity: 1;
+        }
+
+        .dark .bg-white {
+          background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+        }
+
+        .dark .text-gray-800 {
+          color: rgb(229 231 235 / var(--tw-text-opacity));
+        }
+
+        .dark .text-gray-600 {
+          color: rgb(156 163 175 / var(--tw-text-opacity));
+        }
+
+        .dark .border-gray-100 {
+          border-color: rgb(55 65 81 / var(--tw-border-opacity));
+        }
+
+        .dark .bg-gray-50 {
+          background-color: rgb(17 24 39 / var(--tw-bg-opacity));
+        }
+
+        .dark .shadow-lg {
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark .hover\:bg-gray-200:hover {
+          background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+        }
+
+        .dark .focus\:ring-purple-200:focus {
+          --tw-ring-color: rgb(147 51 234 / var(--tw-ring-opacity));
         }
       `}</style>
     </div>

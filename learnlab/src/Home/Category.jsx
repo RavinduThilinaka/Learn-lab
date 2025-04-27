@@ -242,13 +242,7 @@ const CategoryCardsPage = () => {
             </div>
           </div>
 
-          <Link 
-            to="/add-category"
-            className="flex items-center justify-center w-full md:w-auto px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-md"
-          >
-            <FaPlus className="mr-2" />
-            Add New Category
-          </Link>
+         
         </div>
 
         {/* Categories Grid */}

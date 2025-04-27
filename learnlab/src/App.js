@@ -26,13 +26,16 @@ import CategoryListPage from './SkillCatergory/categoryData';
 
 import UpdateSkillChallenge from './SkillChallenge/UpdateSkillChallenge';
 import ViewAllChallenge from './SkillChallenge/ViewAllChallenge';
+import ViewChallenge from './SkillChallenge/ViewChallange';
+import LearningSessionViewer from './Learning_Session/LearningSessionViewer';
+
 import Navbar from './Navbar/Navbar';
 import Chatbot from './Chatbot/Chatbot';
 import ChatForm from './Chatbot/ChatForm';
 import ChatMessage from './Chatbot/ChatMessage';
-import ViewChallenge from './SkillChallenge/ViewChallange';
-import LearningSessionViewer from './Learning_Session/LearningSessionViewer';
 
+
+import Contact from './ContactUs/Contact';
 
 
 
@@ -76,6 +79,8 @@ const App = () => {
         <Route path="/chatmessage" element={<ChatMessage/>}/>
 
         <Route path="/display" element={<LearningSessionViewer/>}/>
+
+        <Route path="/contact" element={<Contact/>}/>
       </Routes>
     </Router>
   );
