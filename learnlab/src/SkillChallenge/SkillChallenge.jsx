@@ -72,7 +72,7 @@ export default function SkillChallenge() {
         correctAnswer: ""
       });
       
-      setTimeout(() => setShowSuccessPopup(false), 6000);
+      setTimeout(() => setShowSuccessPopup(false), 4000);
     } catch (error) {
       console.error('Error submitting challenge:', error);
       setSubmitError(error.message || 'Failed to submit challenge');

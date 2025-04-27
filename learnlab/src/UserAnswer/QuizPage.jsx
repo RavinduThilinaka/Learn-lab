@@ -51,7 +51,7 @@ const QuizPage = () => {
 
   const closeScorePopup = () => {
     setShowScorePopup(false);
-    navigate('/');
+    navigate('/Home');
   };
 
   const finishQuiz = async () => {
@@ -129,11 +129,11 @@ const QuizPage = () => {
   }, [currentQuestionIndex, questions]);
 
   if (questions.length === 0) {
-    return <div className="flex items-center justify-center min-h-screen">Loading questions...</div>;
+    return <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 to-indigo-800">Loading questions...</div>;
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 to-indigo-800 p-4">
       {/* Score Popup */}
       {showScorePopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
