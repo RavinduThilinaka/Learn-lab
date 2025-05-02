@@ -22,6 +22,17 @@ export default function SkillChallenge() {
     optionD: "",
     correctAnswer: ""
   });
+
+  const [errors, setErrors] = useState({
+    questionText: "",
+    deadLine: "",
+    optionA: "",
+    optionB: "",
+    optionC: "",
+    optionD: "",
+    correctAnswer: ""
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -32,10 +43,87 @@ export default function SkillChallenge() {
       ...prev,
       [name]: value
     }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      questionText: "",
+      deadLine: "",
+      optionA: "",
+      optionB: "",
+      optionC: "",
+      optionD: "",
+      correctAnswer: ""
+    };
+
+    // Question text validation
+    if (!formData.questionText.trim()) {
+      newErrors.questionText = "Question text is required";
+      isValid = false;
+    } else if (formData.questionText.length > 500) {
+      newErrors.questionText = "Question text cannot exceed 500 characters";
+      isValid = false;
+    }
+
+    // Deadline validation
+    if (!formData.deadLine) {
+      newErrors.deadLine = "Time limit is required";
+      isValid = false;
+    } else if (isNaN(formData.deadLine)) {
+      newErrors.deadLine = "Time limit must be a number";
+      isValid = false;
+    } else if (parseInt(formData.deadLine) <= 0) {
+      newErrors.deadLine = "Time limit must be a positive number";
+      isValid = false;
+    } else if (parseInt(formData.deadLine) > 60) {
+      newErrors.deadLine = "Time limit cannot exceed 60 minutes";
+      isValid = false;
+    }
+
+    // Options validation
+    if (!formData.optionA.trim()) {
+      newErrors.optionA = "Option A is required";
+      isValid = false;
+    }
+    if (!formData.optionB.trim()) {
+      newErrors.optionB = "Option B is required";
+      isValid = false;
+    }
+    if (!formData.optionC.trim()) {
+      newErrors.optionC = "Option C is required";
+      isValid = false;
+    }
+    if (!formData.optionD.trim()) {
+      newErrors.optionD = "Option D is required";
+      isValid = false;
+    }
+
+    // Correct answer validation
+    if (!formData.correctAnswer) {
+      newErrors.correctAnswer = "Please select the correct answer";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError(null);
     
@@ -84,7 +172,6 @@ export default function SkillChallenge() {
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-purple-700 to-black text-white">
       {/* Success Popup */}
-   
       {showSuccessPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 backdrop-blur-sm">
           <div className="bg-white p-8 rounded-2xl shadow-xl w-96 transform transition-all duration-300 animate-scale-in">
@@ -243,47 +330,51 @@ export default function SkillChallenge() {
           
           <form className="p-8" onSubmit={handleSubmit}>
             {/* Question Text */}
-            <div className="mb-8">
+            <div className="mb-6">
               <label className="block font-bold text-lg text-gray-700 mb-3">Question Text</label>
               <div className="relative">
                 <textarea 
-                  className="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300" 
+                  className={`w-full p-4 bg-gray-50 border-2 ${errors.questionText ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300`} 
                   placeholder="Enter your question here"
                   rows="4"
                   name="questionText"
                   value={formData.questionText}
                   onChange={handleInputChange}
-                  required
                 ></textarea>
                 <div className="absolute bottom-3 right-3 text-xs text-gray-500">
                   Character count: <span>{formData.questionText.length}</span>/500
                 </div>
               </div>
+              {errors.questionText && (
+                <p className="mt-1 text-sm text-red-600">{errors.questionText}</p>
+              )}
             </div>
 
             {/* Deadline */}
-            <div className="mb-8">
+            <div className="mb-6">
               <label className="block font-bold text-lg text-gray-700 mb-3">Time Limit (minutes)</label>
               <div className="relative">
                 <input 
                   type="number" 
                   min="1"
                   max="60"
-                  className="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300" 
+                  className={`w-full p-4 bg-gray-50 border-2 ${errors.deadLine ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300`} 
                   placeholder="Enter duration in minutes (1-60)"
                   name="deadLine"
                   value={formData.deadLine}
                   onChange={handleInputChange}
-                  required
                 />
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">
                   mins
                 </div>
               </div>
+              {errors.deadLine && (
+                <p className="mt-1 text-sm text-red-600">{errors.deadLine}</p>
+              )}
             </div>
 
             {/* Options in 2x2 grid */}
-            <div className="mb-8">
+            <div className="mb-6">
               <label className="block font-bold text-lg text-gray-700 mb-4">Answer Options</label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* First row - A & B */}
@@ -292,28 +383,33 @@ export default function SkillChallenge() {
                     <label className="block font-medium text-gray-700 mb-2">Option A</label>
                     <input 
                       type="text" 
-                      className="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300 pl-10" 
+                      className={`w-full p-4 bg-gray-50 border-2 ${errors.optionA ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300 pl-10`} 
                       placeholder="Enter option A"
                       name="optionA"
                       value={formData.optionA}
                       onChange={handleInputChange}
-                      required
                     />
                     <div className="absolute left-4 top-[2.6rem] text-xs font-bold text-purple-600">A.</div>
                   </div>
+                  {errors.optionA && (
+                    <p className="-mt-4 text-sm text-red-600">{errors.optionA}</p>
+                  )}
+                  
                   <div className="relative">
                     <label className="block font-medium text-gray-700 mb-2">Option B</label>
                     <input 
                       type="text" 
-                      className="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300 pl-10" 
+                      className={`w-full p-4 bg-gray-50 border-2 ${errors.optionB ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300 pl-10`} 
                       placeholder="Enter option B"
                       name="optionB"
                       value={formData.optionB}
                       onChange={handleInputChange}
-                      required
                     />
                     <div className="absolute left-4 top-[2.6rem] text-xs font-bold text-purple-600">B.</div>
                   </div>
+                  {errors.optionB && (
+                    <p className="-mt-4 text-sm text-red-600">{errors.optionB}</p>
+                  )}
                 </div>
                 
                 {/* Second row - C & D */}
@@ -322,28 +418,33 @@ export default function SkillChallenge() {
                     <label className="block font-medium text-gray-700 mb-2">Option C</label>
                     <input 
                       type="text" 
-                      className="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300 pl-10" 
+                      className={`w-full p-4 bg-gray-50 border-2 ${errors.optionC ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300 pl-10`} 
                       placeholder="Enter option C"
                       name="optionC"
                       value={formData.optionC}
                       onChange={handleInputChange}
-                      required
                     />
                     <div className="absolute left-4 top-[2.6rem] text-xs font-bold text-purple-600">C.</div>
                   </div>
+                  {errors.optionC && (
+                    <p className="-mt-4 text-sm text-red-600">{errors.optionC}</p>
+                  )}
+                  
                   <div className="relative">
                     <label className="block font-medium text-gray-700 mb-2">Option D</label>
                     <input 
                       type="text" 
-                      className="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300 pl-10" 
+                      className={`w-full p-4 bg-gray-50 border-2 ${errors.optionD ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition-all duration-300 hover:border-purple-300 pl-10`} 
                       placeholder="Enter option D"
                       name="optionD"
                       value={formData.optionD}
                       onChange={handleInputChange}
-                      required
                     />
                     <div className="absolute left-4 top-[2.6rem] text-xs font-bold text-purple-600">D.</div>
                   </div>
+                  {errors.optionD && (
+                    <p className="-mt-4 text-sm text-red-600">{errors.optionD}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -361,14 +462,16 @@ export default function SkillChallenge() {
                       checked={formData.correctAnswer === option}
                       onChange={handleInputChange}
                       className="hidden peer"
-                      required
                     />
-                    <div className="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-center font-medium text-gray-800 peer-checked:bg-purple-600 peer-checked:border-purple-400 peer-checked:text-white peer-checked:shadow-lg transition-all duration-300 hover:bg-gray-100 cursor-pointer">
+                    <div className={`w-full p-4 bg-gray-50 border-2 ${errors.correctAnswer ? 'border-red-500' : 'border-gray-200'} rounded-xl text-center font-medium text-gray-800 peer-checked:bg-purple-600 peer-checked:border-purple-400 peer-checked:text-white peer-checked:shadow-lg transition-all duration-300 hover:bg-gray-100 cursor-pointer`}>
                       Option {option}
                     </div>
                   </label>
                 ))}
               </div>
+              {errors.correctAnswer && (
+                <p className="mt-2 text-sm text-red-600">{errors.correctAnswer}</p>
+              )}
             </div>
 
             {/* Error message */}
@@ -384,6 +487,15 @@ export default function SkillChallenge() {
                 className="px-8 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-200 transition-colors duration-300 font-medium"
                 onClick={() => {
                   setFormData({
+                    questionText: "",
+                    deadLine: "",
+                    optionA: "",
+                    optionB: "",
+                    optionC: "",
+                    optionD: "",
+                    correctAnswer: ""
+                  });
+                  setErrors({
                     questionText: "",
                     deadLine: "",
                     optionA: "",

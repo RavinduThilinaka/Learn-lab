@@ -6,16 +6,27 @@ import Logo from "../Images/logo1.png";
 
 export default function SkillChallengeAnalysis() {
   const [challenges, setChallenges] = useState([]);
+  const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchChallenges = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8080/public/allChallenge');
-        if (!response.ok) throw new Error('Failed to fetch challenges');
-        const data = await response.json();
-        setChallenges(data);
+        setLoading(true);
+        
+        // Fetch challenges data
+        const challengesResponse = await fetch('http://localhost:8080/public/allChallenge');
+        if (!challengesResponse.ok) throw new Error('Failed to fetch challenges');
+        const challengesData = await challengesResponse.json();
+        setChallenges(challengesData);
+
+        // Fetch answers data
+        const answersResponse = await fetch('http://localhost:8080/public/AllAnswer');
+        if (!answersResponse.ok) throw new Error('Failed to fetch answers');
+        const answersData = await answersResponse.json();
+        setAnswers(answersData);
+
       } catch (err) {
         setError(err.message);
       } finally {
@@ -23,12 +34,12 @@ export default function SkillChallengeAnalysis() {
       }
     };
 
-    fetchChallenges();
+    fetchData();
   }, []);
 
   // Process data for charts
   const processChartData = () => {
-    if (!challenges || challenges.length === 0) return {};
+    if (!challenges || challenges.length === 0 || !answers || answers.length === 0) return {};
 
     // Performance over time - handle invalid dates
     const performanceData = challenges
@@ -42,10 +53,17 @@ export default function SkillChallengeAnalysis() {
           date = new Date(); // Fallback if date parsing fails
         }
         
+        // Find answers for this challenge
+        const challengeAnswers = answers.filter(answer => answer.challengeId === challenge._id);
+        const avgScore = challengeAnswers.length > 0 
+          ? challengeAnswers.reduce((sum, answer) => sum + (answer.score || 0), 0) / challengeAnswers.length
+          : 0;
+        
         return {
           name: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          score: challenge.avgScore || 0,
-          participants: challenge.participantsCount || 0
+          score: Math.round(avgScore),
+          participants: challengeAnswers.length || 0,
+          challenges: 1 // Since we're showing per challenge
         };
       });
 
@@ -71,26 +89,26 @@ export default function SkillChallengeAnalysis() {
     ];
 
     const timeCompletionData = timeRanges.map(range => {
-      const count = challenges.filter(challenge => {
-        const time = challenge.completionTime || 0;
+      const count = answers.filter(answer => {
+        const time = answer.completionTime || 0;
         return time >= range.min && time < range.max;
       }).length;
       return {
         name: range.name,
-        value: Math.round((count / challenges.length) * 100)
+        value: Math.round((count / answers.length) * 100)
       };
     });
 
     // Dashboard stats - Corrected calculations
-    const totalParticipants = challenges.reduce((sum, challenge) => sum + (challenge.participantsCount || 0), 0);
-    const avgScore = challenges.length > 0 
-      ? Math.round(challenges.reduce((sum, challenge) => sum + (challenge.avgScore || 0), 0) / challenges.length)
+    const totalParticipants = answers.reduce((sum, answer) => sum + 1, 0);
+    const avgScore = answers.length > 0 
+      ? Math.round(answers.reduce((sum, answer) => sum + (answer.score || 0), 0) / answers.length)
       : 0;
-    const completionRate = challenges.length > 0
-      ? Math.round((challenges.filter(c => c.completionRate).length / challenges.length) * 100)
+    const completionRate = answers.length > 0
+      ? Math.round((answers.filter(a => a.completed).length / answers.length) * 100)
       : 0;
-    const avgTime = challenges.length > 0
-      ? challenges.reduce((sum, challenge) => sum + (challenge.completionTime || 0), 0) / challenges.length / 60
+    const avgTime = answers.length > 0
+      ? answers.reduce((sum, answer) => sum + (answer.completionTime || 0), 0) / answers.length / 60
       : 0;
 
     const dashboardStats = [
@@ -115,7 +133,16 @@ export default function SkillChallengeAnalysis() {
     dashboardStats = [] 
   } = processChartData();
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+  // Vibrant color palettes for charts
+  const PIE_CHART_COLORS = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', 
+    '#F06292', '#7986CB', '#9575CD', '#64B5F6', '#4DB6AC'
+  ];
+  
+  const BAR_CHART_COLORS = [
+    '#FF9E7D', '#FFD166', '#06D6A0', '#118AB2', '#073B4C',
+    '#EF476F', '#FFD166', '#06D6A0', '#118AB2', '#073B4C'
+  ];
 
   if (loading) {
     return (
@@ -255,7 +282,7 @@ export default function SkillChallengeAnalysis() {
           ))}
         </div>
 
-        {/* Performance Over Time Chart */}
+        {/* First Row - Performance Trends */}
         <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Performance Trends</h2>
           {performanceData.length > 0 ? (
@@ -280,7 +307,7 @@ export default function SkillChallengeAnalysis() {
                   <Line 
                     type="monotone" 
                     dataKey="score" 
-                    stroke="#8884d8" 
+                    stroke="#FF6B6B" 
                     strokeWidth={3}
                     dot={{ r: 5 }}
                     activeDot={{ r: 8 }} 
@@ -289,7 +316,7 @@ export default function SkillChallengeAnalysis() {
                   <Line 
                     type="monotone" 
                     dataKey="participants" 
-                    stroke="#82ca9d" 
+                    stroke="#4ECDC4" 
                     strokeWidth={3}
                     dot={{ r: 5 }}
                     activeDot={{ r: 8 }} 
@@ -305,8 +332,8 @@ export default function SkillChallengeAnalysis() {
           )}
         </div>
 
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        {/* Second Row - Two Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Challenge Distribution Pie Chart */}
           <div className="bg-white rounded-2xl shadow-xl p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Challenge Types Distribution</h2>
@@ -325,7 +352,10 @@ export default function SkillChallengeAnalysis() {
                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                     >
                       {challengeDistribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]} 
+                        />
                       ))}
                     </Pie>
                     <Tooltip 
@@ -335,6 +365,14 @@ export default function SkillChallengeAnalysis() {
                         border: '1px solid #ddd',
                         borderRadius: '0.5rem',
                         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Legend 
+                      layout="vertical"
+                      align="right"
+                      verticalAlign="middle"
+                      wrapperStyle={{
+                        paddingLeft: '20px'
                       }}
                     />
                   </PieChart>
@@ -361,7 +399,7 @@ export default function SkillChallengeAnalysis() {
                     <XAxis dataKey="name" stroke="#666" />
                     <YAxis stroke="#666" />
                     <Tooltip 
-                      formatter={(value) => [`${value}% of challenges`, 'Percentage']}
+                      formatter={(value) => [`${value}% of answers`, 'Percentage']}
                       contentStyle={{
                         background: 'rgba(255, 255, 255, 0.9)',
                         border: '1px solid #ddd',
@@ -371,12 +409,14 @@ export default function SkillChallengeAnalysis() {
                     />
                     <Bar 
                       dataKey="value" 
-                      fill="#8884d8" 
                       radius={[4, 4, 0, 0]}
-                      name="Percentage of challenges"
+                      name="Percentage of answers"
                     >
                       {timeCompletionData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={BAR_CHART_COLORS[index % BAR_CHART_COLORS.length]} 
+                        />
                       ))}
                     </Bar>
                   </BarChart>
