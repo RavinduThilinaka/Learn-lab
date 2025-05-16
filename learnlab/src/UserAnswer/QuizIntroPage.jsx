@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import companyLogo from "../Images/Quize3.gif";
 
 const QuizIntroPage = () => {
   const navigate = useNavigate();
@@ -14,9 +15,18 @@ const QuizIntroPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-purple-700 to-purple-600 p-4">
+    <div 
+      className="min-h-screen p-4"
+      style={{
+        backgroundImage: `url(${companyLogo})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-white shadow-xl rounded-2xl p-8 max-w-2xl w-full text-center transition-all duration-300 hover:shadow-2xl">
+        <div className="bg-white bg-opacity-90 shadow-xl rounded-2xl p-8 max-w-2xl w-full text-center transition-all duration-300 hover:shadow-2xl">
           {!showRules ? (
             <div className="text-center animate-fade-in">
               <h1 className="text-4xl font-bold text-purple-700 mb-4">Welcome to the Quiz!</h1>
