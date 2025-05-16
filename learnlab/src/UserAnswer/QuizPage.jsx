@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Duration } from 'luxon';
 import { useNavigate } from 'react-router-dom';
+import companyLogo from "../Images/Quize3.gif"; // Make sure to import your image
 
 const QuizPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -57,7 +58,6 @@ const QuizPage = () => {
   const finishQuiz = async () => {
     calculateScore();
     try {
-      // Transform answers to match backend structure
       const backendDataArray = answers.map(answer => {
         const backendData = {
           optionA: "",
@@ -66,16 +66,12 @@ const QuizPage = () => {
           optionD: ""
         };
         
-        // Mark the selected option
         backendData[`option${answer.selectedAnswer}`] = "Selected";
-        
-        // Include question ID in one of the unused fields
         backendData.optionA += ` (Q${answer.questionId})`;
         
         return backendData;
       });
 
-      // Submit each answer
       for (const data of backendDataArray) {
         await axios.post('http://localhost:8080/public/submitAnswer', data);
       }
@@ -129,11 +125,33 @@ const QuizPage = () => {
   }, [currentQuestionIndex, questions]);
 
   if (questions.length === 0) {
-    return <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 to-indigo-800">Loading questions...</div>;
+    return (
+      <div 
+        className="flex items-center justify-center min-h-screen p-4"
+        style={{
+          backgroundImage: `url(${companyLogo})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        Loading questions...
+      </div>
+    );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 to-indigo-800 p-4">
+    <div 
+      className="flex items-center justify-center min-h-screen p-4"
+      style={{
+        backgroundImage: `url(${companyLogo})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       {/* Score Popup */}
       {showScorePopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -157,7 +175,7 @@ const QuizPage = () => {
         </div>
       )}
 
-      <div className="bg-white shadow-xl rounded-2xl p-8 max-w-2xl w-full text-center transition-all duration-300 hover:shadow-2xl">
+      <div className="bg-white bg-opacity-90 shadow-xl rounded-2xl p-8 max-w-2xl w-full text-center transition-all duration-300 hover:shadow-2xl">
         <div className="animate-fade-in">
           <div className="flex justify-between items-center mb-6">
             <span className="text-sm font-medium text-gray-500">
