@@ -16,6 +16,7 @@ export default function ViewAllSessions() {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(true);
   const [editFormData, setEditFormData] = useState({
     sessionTitle: '',
     startDate: '',
@@ -27,11 +28,34 @@ export default function ViewAllSessions() {
   });
   const [videoFile, setVideoFile] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [formErrors, setFormErrors] = useState({});
   const tableRef = useRef();
 
   useEffect(() => {
-    fetchSessions();
-  }, []);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/public/getAllSession');
+        setSessions(response.data);
+        setFilteredSessions(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching sessions:', err);
+        setError('Failed to load sessions. Please try again.');
+        setLoading(false);
+        showErrorToast('Failed to load sessions. Please try again.');
+      }
+    };
+
+    fetchData();
+
+    const intervalId = setInterval(() => {
+      if (autoRefresh) {
+        fetchData();
+      }
+    }, 30000);
+
+    return () => clearInterval(intervalId);
+  }, [autoRefresh]);
 
   useEffect(() => {
     if (searchTerm === '') {
@@ -44,20 +68,6 @@ export default function ViewAllSessions() {
       setFilteredSessions(filtered);
     }
   }, [searchTerm, sessions]);
-
-  const fetchSessions = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/public/getAllSession');
-      setSessions(response.data);
-      setFilteredSessions(response.data);
-      setLoading(false);
-    } catch (err) {
-      console.error('Error fetching sessions:', err);
-      setError('Failed to load sessions. Please try again.');
-      setLoading(false);
-      showErrorToast('Failed to load sessions. Please try again.');
-    }
-  };
 
   const showErrorToast = (message) => {
     toast.error(message, {
@@ -140,8 +150,56 @@ export default function ViewAllSessions() {
     }
   };
 
+  const validateForm = () => {
+    const errors = {};
+    
+    // Validate session title
+    if (!editFormData.sessionTitle.trim()) {
+      errors.sessionTitle = 'Session title is required';
+    } else if (editFormData.sessionTitle.length < 3) {
+      errors.sessionTitle = 'Session title must be at least 3 characters long';
+    }
+
+    // Validate dates and times
+    const startDateTime = new Date(`${editFormData.startDate}T${editFormData.startTime}`);
+    const endDateTime = editFormData.endDate && editFormData.endTime 
+      ? new Date(`${editFormData.endDate}T${editFormData.endTime}`)
+      : null;
+
+    if (endDateTime && endDateTime <= startDateTime) {
+      errors.endDateTime = 'End date/time must be after start date/time';
+    }
+
+    // Validate description length
+    if (editFormData.description && editFormData.description.length > 500) {
+      errors.description = 'Description cannot exceed 500 characters';
+    }
+
+    // Validate video file
+    if (videoFile) {
+      const maxSize = 100 * 1024 * 1024; // 100MB
+      const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+      
+      if (videoFile.size > maxSize) {
+        errors.videoFile = 'Video file size must be less than 100MB';
+      }
+      if (!allowedTypes.includes(videoFile.type)) {
+        errors.videoFile = 'Only MP4, WebM, and OGG video formats are allowed';
+      }
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      showErrorToast('Please fix the validation errors before submitting');
+      return;
+    }
     
     try {
       const formData = new FormData();
@@ -177,6 +235,7 @@ export default function ViewAllSessions() {
       setFilteredSessions(updatedSessions);
       setShowEditModal(false);
       setVideoFile(null);
+      setFormErrors({});
       showSuccessToast('Session updated successfully!');
     } catch (err) {
       console.error('Error updating session:', err);
@@ -316,6 +375,21 @@ export default function ViewAllSessions() {
               All Learning Sessions
             </h1>
             <p className="text-lg text-gray-600">View and manage scheduled learning sessions</p>
+            <div className="mt-4 flex justify-center items-center gap-2">
+              <label className="inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoRefresh}
+                  onChange={(e) => setAutoRefresh(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                <span className="ml-3 text-sm font-medium text-gray-700">Auto Refresh</span>
+              </label>
+              {autoRefresh && (
+                <span className="text-sm text-gray-500">(Refreshing every 30 seconds)</span>
+              )}
+            </div>
           </div>
 
           {loading ? (
@@ -531,9 +605,12 @@ export default function ViewAllSessions() {
                     name="sessionTitle"
                     value={editFormData.sessionTitle}
                     onChange={handleEditFormChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                    className={`w-full p-3 border ${formErrors.sessionTitle ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-purple-500 focus:border-purple-500`}
                     required
                   />
+                  {formErrors.sessionTitle && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.sessionTitle}</p>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -567,7 +644,7 @@ export default function ViewAllSessions() {
                       name="endDate"
                       value={editFormData.endDate}
                       onChange={handleEditFormChange}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                      className={`w-full p-3 border ${formErrors.endDateTime ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-purple-500 focus:border-purple-500`}
                     />
                   </div>
                   <div>
@@ -577,10 +654,13 @@ export default function ViewAllSessions() {
                       name="endTime"
                       value={editFormData.endTime}
                       onChange={handleEditFormChange}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                      className={`w-full p-3 border ${formErrors.endDateTime ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-purple-500 focus:border-purple-500`}
                     />
                   </div>
                 </div>
+                {formErrors.endDateTime && (
+                  <p className="col-span-2 mt-1 text-sm text-red-600">{formErrors.endDateTime}</p>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                   <textarea
@@ -588,23 +668,26 @@ export default function ViewAllSessions() {
                     name="description"
                     value={editFormData.description}
                     onChange={handleEditFormChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                    className={`w-full p-3 border ${formErrors.description ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-purple-500 focus:border-purple-500`}
                   />
                 </div>
+                {formErrors.description && (
+                  <p className="mt-1 text-sm text-red-600">{formErrors.description}</p>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Video</label>
                   <div className="flex items-center space-x-4">
                     <div className="flex-1">
                       <input
                         type="file"
-                        accept="video/*"
+                        accept="video/mp4,video/webm,video/ogg"
                         onChange={handleVideoChange}
-                        className="w-full text-sm text-gray-500
+                        className={`w-full text-sm text-gray-500
                           file:mr-4 file:py-2 file:px-4
                           file:rounded-lg file:border-0
                           file:text-sm file:font-semibold
                           file:bg-purple-50 file:text-purple-700
-                          hover:file:bg-purple-100"
+                          hover:file:bg-purple-100 ${formErrors.videoFile ? 'border-red-500' : ''}`}
                       />
                     </div>
                     {editFormData.videoUrl && !videoFile && (
@@ -614,6 +697,9 @@ export default function ViewAllSessions() {
                       </div>
                     )}
                   </div>
+                  {formErrors.videoFile && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.videoFile}</p>
+                  )}
                   {editFormData.videoUrl && !videoFile && (
                     <div className="mt-2">
                       <video controls className="w-full rounded-lg">

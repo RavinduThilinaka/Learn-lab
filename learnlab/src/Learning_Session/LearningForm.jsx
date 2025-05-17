@@ -242,57 +242,57 @@ export default function LearningSessionScheduling() {
            {/* Dashboard Cards */}
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {/* Card 1 - Total Sessions */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 transform transition-all duration-300 hover:scale-105">
+            <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl shadow-lg overflow-hidden border border-purple-400/20 transform transition-all duration-300 hover:scale-105">
               <div className="p-6 flex items-center">
-                <div className="p-4 rounded-full bg-purple-100 mr-4">
-                  <FaCalendarAlt className="text-purple-600 text-2xl" />
+                <div className="p-4 rounded-full bg-white/20 mr-4">
+                  <FaCalendarAlt className="text-white text-2xl" />
                 </div>
                 <div>
-                  <p className="text-gray-500 text-sm">Total Sessions</p>
-                  <h3 className="text-2xl font-bold text-gray-800">24</h3>
-                  <p className="text-green-500 text-sm mt-1">+5 this month</p>
+                  <p className="text-purple-100 text-sm">Total Sessions</p>
+                  <h3 className="text-2xl font-bold text-white">24</h3>
+                  <p className="text-purple-200 text-sm mt-1">+5 this month</p>
                 </div>
               </div>
             </div>
             
             {/* Card 2 - Upcoming Sessions */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 transform transition-all duration-300 hover:scale-105">
+            <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-lg overflow-hidden border border-blue-400/20 transform transition-all duration-300 hover:scale-105">
               <div className="p-6 flex items-center">
-                <div className="p-4 rounded-full bg-blue-100 mr-4">
-                  <FaClock className="text-blue-600 text-2xl" />
+                <div className="p-4 rounded-full bg-white/20 mr-4">
+                  <FaClock className="text-white text-2xl" />
                 </div>
                 <div>
-                  <p className="text-gray-500 text-sm">Upcoming</p>
-                  <h3 className="text-2xl font-bold text-gray-800">8</h3>
-                  <p className="text-purple-500 text-sm mt-1">Next in 2 days</p>
+                  <p className="text-blue-100 text-sm">Upcoming</p>
+                  <h3 className="text-2xl font-bold text-white">8</h3>
+                  <p className="text-blue-200 text-sm mt-1">Next in 2 days</p>
                 </div>
               </div>
             </div>
             
             {/* Card 3 - Participants */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 transform transition-all duration-300 hover:scale-105">
+            <div className="bg-gradient-to-br from-green-500 to-green-700 rounded-xl shadow-lg overflow-hidden border border-green-400/20 transform transition-all duration-300 hover:scale-105">
               <div className="p-6 flex items-center">
-                <div className="p-4 rounded-full bg-green-100 mr-4">
-                  <FaUsers className="text-green-600 text-2xl" />
+                <div className="p-4 rounded-full bg-white/20 mr-4">
+                  <FaUsers className="text-white text-2xl" />
                 </div>
                 <div>
-                  <p className="text-gray-500 text-sm">Participants</p>
-                  <h3 className="text-2xl font-bold text-gray-800">143</h3>
-                  <p className="text-blue-500 text-sm mt-1">+12 new</p>
+                  <p className="text-green-100 text-sm">Participants</p>
+                  <h3 className="text-2xl font-bold text-white">143</h3>
+                  <p className="text-green-200 text-sm mt-1">+12 new</p>
                 </div>
               </div>
             </div>
             
             {/* Card 4 - Completion Rate */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 transform transition-all duration-300 hover:scale-105">
+            <div className="bg-gradient-to-br from-orange-500 to-orange-700 rounded-xl shadow-lg overflow-hidden border border-orange-400/20 transform transition-all duration-300 hover:scale-105">
               <div className="p-6 flex items-center">
-                <div className="p-4 rounded-full bg-orange-100 mr-4">
-                  <FaTrophy className="text-orange-600 text-2xl" />
+                <div className="p-4 rounded-full bg-white/20 mr-4">
+                  <FaTrophy className="text-white text-2xl" />
                 </div>
                 <div>
-                  <p className="text-gray-500 text-sm">Completion Rate</p>
-                  <h3 className="text-2xl font-bold text-gray-800">89%</h3>
-                  <p className="text-green-500 text-sm mt-1">+7% this month</p>
+                  <p className="text-orange-100 text-sm">Completion Rate</p>
+                  <h3 className="text-2xl font-bold text-white">89%</h3>
+                  <p className="text-orange-200 text-sm mt-1">+7% this month</p>
                 </div>
               </div>
             </div>
