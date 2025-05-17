@@ -345,6 +345,7 @@ export default function LearningSessionScheduling() {
                     name="startDate"
                     value={formData.startDate}
                     onChange={handleInputChange}
+                    min={new Date().toISOString().split('T')[0]}
                     className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-300"
                     required
                   />
@@ -361,6 +362,7 @@ export default function LearningSessionScheduling() {
                     name="endDate"
                     value={formData.endDate}
                     onChange={handleInputChange}
+                    min={new Date().toISOString().split('T')[0]}
                     className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-300"
                   />
                 </div>

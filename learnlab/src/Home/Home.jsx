@@ -124,7 +124,15 @@ export default function Home() {
       try {
         const response = await axios.get('http://localhost:8080/public/allFeedback');
         const feedbackData = Array.isArray(response.data) ? response.data : [];
-        setFeedbacks(feedbackData);
+        // Ensure we have the correct data structure
+        const formattedFeedbacks = feedbackData.map(feedback => ({
+          id: feedback.id,
+          userName: feedback.userName || feedback.user?.name || 'Anonymous User',
+          comment: feedback.comment || feedback.feedbackText || 'No comment provided',
+          rating: typeof feedback.rating === 'number' ? feedback.rating : 0,
+          createdAt: feedback.createdAt
+        }));
+        setFeedbacks(formattedFeedbacks);
         setFeedbackLoading(false);
       } catch (err) {
         console.error('Error fetching feedbacks:', err);
