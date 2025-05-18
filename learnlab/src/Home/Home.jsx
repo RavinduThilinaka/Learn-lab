@@ -334,45 +334,114 @@ export default function Home() {
         {isDarkMode ? <FaSun className="text-xl" /> : <FaMoon className="text-xl" />}
       </button>
       
-      {/* Hero Section with Parallax and Fade-in */}
+      {/* Hero Section with Advanced Design */}
       <section
         id="home"
         ref={heroRef}
-        className={`relative w-full h-[70vh] md:h-[80vh] flex items-center justify-center bg-cover bg-center bg-fixed transition-all duration-1000 ${
+        className={`relative w-full h-screen flex items-center justify-center overflow-hidden transition-all duration-1000 ${
           isHeroVisible ? 'opacity-100' : 'opacity-0'
         }`}
-        style={{ 
-          backgroundImage: `url(${images[currentIndex]})`,
-          backgroundAttachment: 'fixed',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover'
-        }}
       >
-        <div className={`absolute inset-0 bg-black opacity-50 transition-opacity duration-1000 ${
-          isHeroVisible ? 'opacity-50' : 'opacity-0'
-        }`} />
+        {/* Background Video/Image with Parallax */}
+        <div 
+          className="absolute inset-0 w-full h-full transition-transform duration-1000"
+          style={{ 
+            backgroundImage: `url(${images[currentIndex]})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            transform: `scale(${isHeroVisible ? 1.1 : 1})`,
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+        </div>
 
-        <div className={`relative text-center text-white px-6 transform transition-all duration-1000 ${
+        {/* Animated Particles Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                opacity: Math.random() * 0.5 + 0.2,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Main Content */}
+        <div className={`relative z-10 text-center px-6 max-w-6xl mx-auto transform transition-all duration-1000 ${
           isHeroVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
         }`}>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
-            Unlock Your <span className="text-yellow-500">Creativity</span>
+          {/* Animated Badge */}
+          <div className="inline-block mb-6 animate-bounce-slow">
+            <span className="bg-purple-600/20 text-purple-300 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm border border-purple-500/30">
+              Welcome to SkillShare
+            </span>
+          </div>
+
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 animate-gradient-x">
+              Unlock Your
+            </span>
+            <span className="block text-white mt-2">
+              Creative <span className="text-yellow-400">Potential</span>
+            </span>
           </h1>
-          <p className="text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 max-w-2xl mx-auto px-4">
-            Learn from thousands of inspiring classes to enhance your skills.
+
+          <p className="text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+            Join thousands of learners worldwide and transform your skills with our expert-led courses.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+          {/* CTA Buttons with Hover Effects */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link 
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 md:px-6 md:py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
               to={"/bot"}
+              className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full text-white font-medium overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30"
             >
-              <FaRobot className="h-5 w-5" />
-              <span>AI Assistant</span>
+              <span className="relative z-10 flex items-center gap-2">
+                <FaRobot className="h-5 w-5 group-hover:rotate-12 transition-transform" />
+                <span>AI Assistant</span>
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Link>
-            <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 md:px-8 md:py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              Get Started
+
+            <button className="group relative px-8 py-4 bg-transparent border-2 border-white rounded-full text-white font-medium overflow-hidden transition-all duration-300 hover:bg-white hover:text-black">
+              <span className="relative z-10">Get Started</span>
+              <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
             </button>
+          </div>
+
+          {/* Stats Section */}
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            {[
+              { number: '10K+', label: 'Active Students' },
+              { number: '500+', label: 'Expert Instructors' },
+              { number: '1000+', label: 'Online Courses' },
+              { number: '50+', label: 'Countries' }
+            ].map((stat, index) => (
+              <div 
+                key={index}
+                className={`text-center transform transition-all duration-1000 ${
+                  isHeroVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <div className="text-3xl md:text-4xl font-bold text-white mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-sm text-gray-400">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-white rounded-full mt-2 animate-scroll" />
           </div>
         </div>
       </section>
@@ -1123,6 +1192,43 @@ export default function Home() {
       </footer>
 
       <style jsx global>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
+        }
+
+        @keyframes gradient-x {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+
+        @keyframes scroll {
+          0% { transform: translateY(0); opacity: 1; }
+          100% { transform: translateY(10px); opacity: 0; }
+        }
+
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-gradient-x {
+          background-size: 200% auto;
+          animation: gradient-x 8s linear infinite;
+        }
+
+        .animate-scroll {
+          animation: scroll 2s ease-in-out infinite;
+        }
+
+        .animate-bounce-slow {
+          animation: bounce 3s infinite;
+        }
+
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+
         @keyframes fadeInSlide {
           0% {
             opacity: 0;
