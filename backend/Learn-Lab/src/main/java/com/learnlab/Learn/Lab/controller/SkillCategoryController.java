@@ -11,7 +11,7 @@ import java.util.List;
 @RestController // Marks this class as a Spring MVC controller that handles REST API requests
 public class SkillCategoryController {
 
-    @Autowired // Automatically injects the SkillCategoryRepo dependency
+    @Autowired 
     private SkillCategoryRepo skillCategoryRepo;
 
     /**
@@ -22,6 +22,7 @@ public class SkillCategoryController {
      * @param categoryImage Image file for the category
      * @return Success or failure message with category ID or error message
      */
+
     @PostMapping("/public/addCategory")
     public String addCategory(
             @RequestParam("categoryTitle") String categoryTitle,
@@ -30,12 +31,14 @@ public class SkillCategoryController {
             @RequestParam("categoryImage") MultipartFile categoryImage
     ) {
         try {
+
             // Create new SkillCategory entity and set its properties
+
             SkillCategory skillCategory = new SkillCategory();
             skillCategory.setCategoryTitle(categoryTitle);
             skillCategory.setCategoryName(categoryName);
             skillCategory.setDescription(description);
-            skillCategory.setCategoryImage(categoryImage.getBytes()); // Convert image to byte array
+            skillCategory.setCategoryImage(categoryImage.getBytes()); 
 
             // Save the category to database
             skillCategoryRepo.save(skillCategory);
@@ -54,12 +57,7 @@ public class SkillCategoryController {
         return skillCategoryRepo.findAll(); // Returns all categories from database
     }
 
-    /**
-     * Endpoint to get a specific category by ID
-     * @param id ID of the category to retrieve
-     * @return The found SkillCategory entity
-     * @throws RuntimeException if category not found
-     */
+   
     @GetMapping("/public/CategoryGetById/{id}")
     public SkillCategory getSkillCategoryById(@PathVariable Long id) {
         return skillCategoryRepo.findById(id)
@@ -75,6 +73,7 @@ public class SkillCategoryController {
      * @param categoryImage Optional updated image (can be null)
      * @return Success or failure message
      */
+
     @PutMapping("/public/updateCategory/{id}")
     public String updateCategory(
             @PathVariable Long id,
@@ -111,6 +110,7 @@ public class SkillCategoryController {
      * @param id ID of the category to delete
      * @return Success or failure message
      */
+    
     @DeleteMapping("/public/deleteCategory/{id}")
     public String deleteCategory(@PathVariable Long id) {
         if (skillCategoryRepo.existsById(id)) {
